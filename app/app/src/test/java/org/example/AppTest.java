@@ -19,7 +19,7 @@ class AppTest {
     @ParameterizedTest(name = "{0}を渡したら{1}を返す")
     @MethodSource("fibonacciTestCases")
     void testFibonacciCalculation(int input, int expected) {
-        assertEquals(expected, Fibonacci.calc(input));
+        assertEquals(expected, Fibonacci.recursive(input));
     }
     
     static Stream<Arguments> fibonacciTestCases() {
@@ -35,17 +35,17 @@ class AppTest {
 
     @DisplayName("大きな数字_再起処理による実装")
     @Test void test_Large_Number() {
-        assertEquals(102_334_155, Fibonacci.calc(40));
+        assertEquals(102_334_155, Fibonacci.recursive(40));
     }
 
     @DisplayName("大きな数字_ループ処理による実装")
     @Test void test_Large_Number_By_Loop() {
-        assertEquals(102_334_155, Fibonacci.calc2(40));
+        assertEquals(102_334_155, Fibonacci.loop(40));
     }
 
     @DisplayName("大きな数字_一般項による実装")
     @Test void test_Large_Number_By_General() {
-        assertEquals(102_334_155, Fibonacci.calc3(40));
+        assertEquals(102_334_155, Fibonacci.generalTerm(40));
     }
 
 
@@ -54,7 +54,7 @@ class AppTest {
 class Fibonacci {
     private static final Map<Integer, Integer> cache = new HashMap<>();
     
-    public static int calc(int number) {
+    public static int recursive(int number) {
         // 既に計算済みの値であればキャッシュから返す
         if (cache.containsKey(number)) {
             return cache.get(number);
@@ -65,13 +65,13 @@ class Fibonacci {
         if (number == 1) return 1;
         
         // 再帰的に計算し、結果をキャッシュに保存
-        int result = calc(number - 1) + calc(number - 2);
+        int result = recursive(number - 1) + recursive(number - 2);
         cache.put(number, result);
         
         return result;
     }
 
-    public static int calc2(int number) {
+    public static int loop(int number) {
         int a = 0;
         int b = 1;
         int c = 0;
@@ -83,7 +83,7 @@ class Fibonacci {
         return a;
     }
 
-    public static int calc3(int number) {
+    public static int generalTerm(int number) {
         double sqrt5 = Math.sqrt(5);
         double phi = (1 + sqrt5) / 2;
         return (int) Math.round(Math.pow(phi, number) / sqrt5);
