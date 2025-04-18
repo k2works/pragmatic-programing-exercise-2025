@@ -24,13 +24,23 @@ class AppTest {
     @Test void when3_then2() {
         assertEquals(2, Fibonacci.fib(3));
     }
+
+    @DisplayName("4を渡したら3を返す")
+    @Test void when4_then3() {
+        assertEquals(3, Fibonacci.fib(4));
+    }
+
+    @DisplayName("5を渡したら5を返す")
+    @Test void when5_then5() {
+        assertEquals(5, Fibonacci.fib(5));
+    }
 }
 
 class Fibonacci {
     public static int fib(int i) {
         if (i == 0) return 0;
-        if (i <= 2) return 1;
+        if (i == 1) return 1;
 
-        return 2;
+        return fib(i - 1) + fib(i - 2);
     }
 }
