@@ -45,7 +45,7 @@ class AppTest {
 
     @DisplayName("大きな数字_一般項による実装")
     @Test void test_Large_Number_By_General() {
-        assertEquals(102_334_155, Fibonacci.generalTerm(40));
+        assertEquals(102_334_155, FibonacciGeneralTerm.exec(40));
     }
 
 
@@ -122,5 +122,13 @@ class FibonacciLoop {
             b = temp;
         }
         return a;
+    }
+}
+
+class FibonacciGeneralTerm {
+    public static int exec(int number) {
+        double sqrt5 = Math.sqrt(5);
+        double phi = (1 + sqrt5) / 2;
+        return (int) Math.round(Math.pow(phi, number) / sqrt5);
     }
 }
