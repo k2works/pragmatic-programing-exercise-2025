@@ -14,6 +14,11 @@ class AppTest {
     @Test void when1_then1() {
         assertEquals(1, Fibonacci.fib(1));
     }
+
+    @DisplayName("2を渡したら1を返す")
+    @Test void when2_then1() {
+        assertEquals(1, Fibonacci.fib(2));
+    }
 }
 
 class Fibonacci {
