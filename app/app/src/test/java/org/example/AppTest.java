@@ -35,7 +35,7 @@ class AppTest {
 
     @DisplayName("大きな数字_再起処理による実装")
     @Test void test_Large_Number() {
-        assertEquals(102_334_155, Fibonacci.recursive(40));
+        assertEquals(102_334_155, FibonacciRecursive.exec(40));
     }
 
     @DisplayName("大きな数字_ループ処理による実装")
@@ -87,5 +87,26 @@ class Fibonacci {
         double sqrt5 = Math.sqrt(5);
         double phi = (1 + sqrt5) / 2;
         return (int) Math.round(Math.pow(phi, number) / sqrt5);
+    }
+}
+
+class FibonacciRecursive {
+    private static final Map<Integer, Integer> cache = new HashMap<>();
+
+    public static int exec(int number) {
+        // 既に計算済みの値であればキャッシュから返す
+        if (cache.containsKey(number)) {
+            return cache.get(number);
+        }
+
+        // ベースケース
+        if (number == 0) return 0;
+        if (number == 1) return 1;
+
+        // 再帰的に計算し、結果をキャッシュに保存
+        int result = exec(number - 1) + exec(number - 2);
+        cache.put(number, result);
+
+        return result;
     }
 }
