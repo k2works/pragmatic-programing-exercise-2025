@@ -19,11 +19,18 @@ class AppTest {
     @Test void when2_then1() {
         assertEquals(1, Fibonacci.fib(2));
     }
+
+    @DisplayName("3を渡したら2を返す")
+    @Test void when3_then2() {
+        assertEquals(2, Fibonacci.fib(3));
+    }
 }
 
 class Fibonacci {
     public static int fib(int i) {
         if (i == 0) return 0;
-        return 1;
+        if (i <= 2) return 1;
+
+        return 2;
     }
 }
