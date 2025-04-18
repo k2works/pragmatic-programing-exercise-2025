@@ -33,10 +33,16 @@ class AppTest {
         );
     }
 
-    @DisplayName("大きな数字")
-    @Test void testLargeNumber() {
+    @DisplayName("大きな数字_再起処理による実装")
+    @Test void test_Large_Number() {
         assertEquals(102_334_155, Fibonacci.calc(40));
     }
+
+    @DisplayName("大きな数字_ループ処理による実装")
+    @Test void test_Large_Number_By_Loop() {
+        assertEquals(102_334_155, Fibonacci.calc2(40));
+    }
+
 }
 
 class Fibonacci {
@@ -57,5 +63,17 @@ class Fibonacci {
         cache.put(number, result);
         
         return result;
+    }
+
+    public static int calc2(int number) {
+        int a = 0;
+        int b = 1;
+        int c = 0;
+        for (int i = 0; i < number; i++) {
+            a = b;
+            b = c;
+            c = a + b;
+        }
+        return c;
     }
 }
