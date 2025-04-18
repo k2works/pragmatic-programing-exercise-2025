@@ -40,7 +40,7 @@ class AppTest {
 
     @DisplayName("大きな数字_ループ処理による実装")
     @Test void test_Large_Number_By_Loop() {
-        assertEquals(102_334_155, Fibonacci.loop(40));
+        assertEquals(102_334_155, FibonacciLoop.exec(40));
     }
 
     @DisplayName("大きな数字_一般項による実装")
@@ -108,5 +108,19 @@ class FibonacciRecursive {
         cache.put(number, result);
 
         return result;
+    }
+}
+
+class FibonacciLoop {
+    public static int exec(int number) {
+        int a = 0;
+        int b = 1;
+        int c = 0;
+        for (int i = 0; i < number; i++) {
+            int temp = a + b;
+            a = b;
+            b = temp;
+        }
+        return a;
     }
 }
