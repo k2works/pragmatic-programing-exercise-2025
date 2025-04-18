@@ -43,6 +43,12 @@ class AppTest {
         assertEquals(102_334_155, Fibonacci.calc2(40));
     }
 
+    @DisplayName("大きな数字_一般項による実装")
+    @Test void test_Large_Number_By_General() {
+        assertEquals(102_334_155, Fibonacci.calc3(40));
+    }
+
+
 }
 
 class Fibonacci {
@@ -70,10 +76,16 @@ class Fibonacci {
         int b = 1;
         int c = 0;
         for (int i = 0; i < number; i++) {
+            int temp = a + b;
             a = b;
-            b = c;
-            c = a + b;
+            b = temp;
         }
-        return c;
+        return a;
+    }
+
+    public static int calc3(int number) {
+        double sqrt5 = Math.sqrt(5);
+        double phi = (1 + sqrt5) / 2;
+        return (int) Math.round(Math.pow(phi, number) / sqrt5);
     }
 }
