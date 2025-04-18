@@ -5,6 +5,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,10 +34,22 @@ class AppTest {
 }
 
 class Fibonacci {
+    private static final Map<Integer, Integer> cache = new HashMap<>();
+    
     public static int calc(int number) {
+        // 既に計算済みの値であればキャッシュから返す
+        if (cache.containsKey(number)) {
+            return cache.get(number);
+        }
+        
+        // ベースケース
         if (number == 0) return 0;
         if (number == 1) return 1;
-
-        return calc(number - 1) + calc(number - 2);
+        
+        // 再帰的に計算し、結果をキャッシュに保存
+        int result = calc(number - 1) + calc(number - 2);
+        cache.put(number, result);
+        
+        return result;
     }
 }
