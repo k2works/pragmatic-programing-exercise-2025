@@ -9,10 +9,16 @@ class AppTest {
     @Test void when0_then0() {
         assertEquals(0, Fibonacci.fib(0));
     }
+
+    @DisplayName("1を渡したら1を返す")
+    @Test void when1_then1() {
+        assertEquals(1, Fibonacci.fib(1));
+    }
 }
 
 class Fibonacci {
     public static int fib(int i) {
-        return 0;
+        if (i == 0) return 0;
+        return 1;
     }
 }
