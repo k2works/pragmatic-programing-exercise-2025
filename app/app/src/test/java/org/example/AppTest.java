@@ -19,7 +19,8 @@ class AppTest {
     @ParameterizedTest(name = "{0}を渡したら{1}を返す")
     @MethodSource("fibonacciTestCases")
     void testFibonacciCalculation(int input, int expected) {
-        assertEquals(expected, Fibonacci.recursive(input));
+        Fibonacci command = new Fibonacci(FibonacciRecursive::exec);
+        assertEquals(expected,command.exec(input));
     }
     
     static Stream<Arguments> fibonacciTestCases() {
@@ -35,58 +36,36 @@ class AppTest {
 
     @DisplayName("大きな数字_再起処理による実装")
     @Test void test_Large_Number() {
-        assertEquals(102_334_155, FibonacciRecursive.exec(40));
+        Fibonacci command = new Fibonacci(FibonacciLoop::exec);
+        assertEquals(102_334_155, command.exec(40));
     }
 
     @DisplayName("大きな数字_ループ処理による実装")
     @Test void test_Large_Number_By_Loop() {
-        assertEquals(102_334_155, FibonacciLoop.exec(40));
+        Fibonacci command = new Fibonacci(FibonacciLoop::exec);
+        assertEquals(102_334_155, command.exec(40));
     }
 
     @DisplayName("大きな数字_一般項による実装")
     @Test void test_Large_Number_By_General() {
-        assertEquals(102_334_155, FibonacciGeneralTerm.exec(40));
+        Fibonacci command = new Fibonacci(FibonacciGeneralTerm::exec);
+        assertEquals(102_334_155, command.exec(40));
     }
+}
 
-
+interface FibonacciCalculator {
+    int exec(int number);
 }
 
 class Fibonacci {
-    private static final Map<Integer, Integer> cache = new HashMap<>();
-    
-    public static int recursive(int number) {
-        // 既に計算済みの値であればキャッシュから返す
-        if (cache.containsKey(number)) {
-            return cache.get(number);
-        }
-        
-        // ベースケース
-        if (number == 0) return 0;
-        if (number == 1) return 1;
-        
-        // 再帰的に計算し、結果をキャッシュに保存
-        int result = recursive(number - 1) + recursive(number - 2);
-        cache.put(number, result);
-        
-        return result;
+    FibonacciCalculator algorithm;
+
+    public Fibonacci(FibonacciCalculator algorithm) {
+        this.algorithm = algorithm;
     }
 
-    public static int loop(int number) {
-        int a = 0;
-        int b = 1;
-        int c = 0;
-        for (int i = 0; i < number; i++) {
-            int temp = a + b;
-            a = b;
-            b = temp;
-        }
-        return a;
-    }
-
-    public static int generalTerm(int number) {
-        double sqrt5 = Math.sqrt(5);
-        double phi = (1 + sqrt5) / 2;
-        return (int) Math.round(Math.pow(phi, number) / sqrt5);
+    public int exec(int number) {
+        return algorithm.exec(number);
     }
 }
 
