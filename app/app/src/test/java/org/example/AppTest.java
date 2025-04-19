@@ -19,7 +19,7 @@ class AppTest {
     @ParameterizedTest(name = "{0}を渡したら{1}を返す")
     @MethodSource("fibonacciTestCases")
     void test_FibonacciCalculation_Recursive(int input, int expected) {
-        Fibonacci command = new Fibonacci(FibonacciRecursive::exec);
+        Fibonacci command = new Fibonacci(new FibonacciRecursive());
         assertEquals(expected,command.exec(input));
     }
 
@@ -27,7 +27,7 @@ class AppTest {
     @ParameterizedTest(name = "{0}を渡したら{1}を返す")
     @MethodSource("fibonacciTestCases")
     void test_FibonacciCalculation_Loop(int input, int expected) {
-        Fibonacci command = new Fibonacci(FibonacciLoop::exec);
+        Fibonacci command = new Fibonacci(new FibonacciLoop());
         assertEquals(expected,command.exec(input));
     }
 
@@ -35,7 +35,7 @@ class AppTest {
     @ParameterizedTest(name = "{0}を渡したら{1}を返す")
     @MethodSource("fibonacciTestCases")
     void test_FibonacciCalculation_GeneralTerm(int input, int expected) {
-        Fibonacci command = new Fibonacci(FibonacciGeneralTerm::exec);
+        Fibonacci command = new Fibonacci(new FibonacciGeneralTerm());
         assertEquals(expected,command.exec(input));
     }
 
@@ -52,19 +52,19 @@ class AppTest {
 
     @DisplayName("大きな数字_再起処理による実装")
     @Test void test_Large_Number() {
-        Fibonacci command = new Fibonacci(FibonacciRecursive::exec);
+        Fibonacci command = new Fibonacci(new FibonacciRecursive());
         assertEquals(102_334_155, command.exec(40));
     }
 
     @DisplayName("大きな数字_ループ処理による実装")
     @Test void test_Large_Number_By_Loop() {
-        Fibonacci command = new Fibonacci(FibonacciLoop::exec);
+        Fibonacci command = new Fibonacci(new FibonacciLoop());
         assertEquals(102_334_155, command.exec(40));
     }
 
     @DisplayName("大きな数字_一般項による実装")
     @Test void test_Large_Number_By_General() {
-        Fibonacci command = new Fibonacci(FibonacciGeneralTerm::exec);
+        Fibonacci command = new Fibonacci(new FibonacciGeneralTerm());
         assertEquals(102_334_155, command.exec(40));
     }
 
@@ -72,7 +72,7 @@ class AppTest {
     @ParameterizedTest(name = "{0}を渡したらIllegalArgumentExceptionをスローする")
     @MethodSource("invalidFibonacciTestCases")
     void test_InvalidFibonacciCalculation(int input) {
-        Fibonacci command = new Fibonacci(FibonacciRecursive::exec);
+        Fibonacci command = new Fibonacci(new FibonacciRecursive());
         assertThrows(IllegalArgumentException.class, () -> command.exec(input));
     }
 
@@ -107,10 +107,10 @@ class Fibonacci {
     }
 }
 
-class FibonacciRecursive {
-    private static final Map<Integer, Integer> cache = new HashMap<>();
+class FibonacciRecursive implements FibonacciCalculator {
+    private final Map<Integer, Integer> cache = new HashMap<>();
 
-    public static int exec(int number) {
+    public int exec(int number) {
         // 既に計算済みの値であればキャッシュから返す
         if (cache.containsKey(number)) {
             return cache.get(number);
@@ -128,8 +128,8 @@ class FibonacciRecursive {
     }
 }
 
-class FibonacciLoop {
-    public static int exec(int number) {
+class FibonacciLoop implements FibonacciCalculator {
+    public int exec(int number) {
         int a = 0;
         int b = 1;
         int c = 0;
@@ -142,8 +142,8 @@ class FibonacciLoop {
     }
 }
 
-class FibonacciGeneralTerm {
-    public static int exec(int number) {
+class FibonacciGeneralTerm implements FibonacciCalculator {
+    public int exec(int number) {
         double sqrt5 = Math.sqrt(5);
         double phi = (1 + sqrt5) / 2;
         return (int) Math.round(Math.pow(phi, number) / sqrt5);
