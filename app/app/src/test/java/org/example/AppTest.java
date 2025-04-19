@@ -36,7 +36,7 @@ class AppTest {
 
     @DisplayName("大きな数字_再起処理による実装")
     @Test void test_Large_Number() {
-        Fibonacci command = new Fibonacci(FibonacciLoop::exec);
+        Fibonacci command = new Fibonacci(FibonacciRecursive::exec);
         assertEquals(102_334_155, command.exec(40));
     }
 
