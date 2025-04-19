@@ -3,12 +3,17 @@
  */
 package org.example;
 
+import org.example.fibonacci.Fibonacci;
+import org.example.fibonacci.FibonacciRecursive;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        Fibonacci fibonacci = new Fibonacci(new FibonacciRecursive());
+        logger.info("Fibonacci(10) = {}", fibonacci.exec(10));
     }
 }
