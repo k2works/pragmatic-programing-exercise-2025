@@ -96,11 +96,11 @@ class FibonacciLoop {
         int b = 1;
         int c = 0;
         for (int i = 0; i < number; i++) {
-            int temp = a + b;
             a = b;
-            b = temp;
+            b = c;
+            c = a + b;
         }
-        return a;
+        return c;
     }
 }
 
