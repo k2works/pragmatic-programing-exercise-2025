@@ -18,19 +18,35 @@ class AppTest {
     @DisplayName("Fibonacciの計算テスト")
     @ParameterizedTest(name = "{0}を渡したら{1}を返す")
     @MethodSource("fibonacciTestCases")
-    void testFibonacciCalculation(int input, int expected) {
+    void test_FibonacciCalculation_Recursive(int input, int expected) {
         Fibonacci command = new Fibonacci(FibonacciRecursive::exec);
         assertEquals(expected,command.exec(input));
     }
-    
+
+    @DisplayName("Fibonacciの計算テスト")
+    @ParameterizedTest(name = "{0}を渡したら{1}を返す")
+    @MethodSource("fibonacciTestCases")
+    void test_FibonacciCalculation_Loop(int input, int expected) {
+        Fibonacci command = new Fibonacci(FibonacciLoop::exec);
+        assertEquals(expected,command.exec(input));
+    }
+
+    @DisplayName("Fibonacciの計算テスト")
+    @ParameterizedTest(name = "{0}を渡したら{1}を返す")
+    @MethodSource("fibonacciTestCases")
+    void test_FibonacciCalculation_GeneralTerm(int input, int expected) {
+        Fibonacci command = new Fibonacci(FibonacciGeneralTerm::exec);
+        assertEquals(expected,command.exec(input));
+    }
+
     static Stream<Arguments> fibonacciTestCases() {
         return Stream.of(
-            arguments(0, 0),
-            arguments(1, 1),
-            arguments(2, 1),
-            arguments(3, 2),
-            arguments(4, 3),
-            arguments(5, 5)
+                arguments(0, 0),
+                arguments(1, 1),
+                arguments(2, 1),
+                arguments(3, 2),
+                arguments(4, 3),
+                arguments(5, 5)
         );
     }
 
