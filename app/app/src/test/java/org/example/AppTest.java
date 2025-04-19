@@ -67,6 +67,25 @@ class AppTest {
         Fibonacci command = new Fibonacci(FibonacciGeneralTerm::exec);
         assertEquals(102_334_155, command.exec(40));
     }
+
+    @DisplayName("非負整数以外の値を渡した場合")
+    @ParameterizedTest(name = "{0}を渡したらIllegalArgumentExceptionをスローする")
+    @MethodSource("invalidFibonacciTestCases")
+    void test_InvalidFibonacciCalculation(int input) {
+        Fibonacci command = new Fibonacci(FibonacciRecursive::exec);
+        assertThrows(IllegalArgumentException.class, () -> command.exec(input));
+    }
+
+    static Stream<Arguments> invalidFibonacciTestCases() {
+        return Stream.of(
+                arguments(-1),
+                arguments(-2),
+                arguments(-3),
+                arguments(-4),
+                arguments(-5)
+        );
+    }
+
 }
 
 interface FibonacciCalculator {
@@ -81,6 +100,9 @@ class Fibonacci {
     }
 
     public int exec(int number) {
+        if (number < 0) {
+            throw new IllegalArgumentException("入力値は0以上である必要があります");
+        }
         return algorithm.exec(number);
     }
 }
