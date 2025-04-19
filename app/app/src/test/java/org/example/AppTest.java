@@ -116,9 +116,11 @@ class AppTest {
         // 92はオーバーフローしない最大値
         Fibonacci commandRecursive = new Fibonacci(new FibonacciRecursive());
         Fibonacci commandLoop = new Fibonacci(new FibonacciLoop());
+        Fibonacci commandGeneralTerm = new Fibonacci(new FibonacciGeneralTerm());
         
         assertDoesNotThrow(() -> commandRecursive.exec(92));
         assertDoesNotThrow(() -> commandLoop.exec(92));
+        assertDoesNotThrow(() -> commandGeneralTerm.exec(92));
     }
 }
 
