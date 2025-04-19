@@ -15,7 +15,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class AppTest {
     
-    @DisplayName("Fibonacciの計算テスト")
+    @DisplayName("Fibonacciの計算テスト_再帰処理")
     @ParameterizedTest(name = "{0}を渡したら{1}を返す")
     @MethodSource("fibonacciTestCases")
     void test_FibonacciCalculation_Recursive(int input, int expected) {
@@ -23,7 +23,7 @@ class AppTest {
         assertEquals(expected,command.exec(input));
     }
 
-    @DisplayName("Fibonacciの計算テスト")
+    @DisplayName("Fibonacciの計算テスト_ループ処理")
     @ParameterizedTest(name = "{0}を渡したら{1}を返す")
     @MethodSource("fibonacciTestCases")
     void test_FibonacciCalculation_Loop(int input, int expected) {
@@ -31,7 +31,7 @@ class AppTest {
         assertEquals(expected,command.exec(input));
     }
 
-    @DisplayName("Fibonacciの計算テスト")
+    @DisplayName("Fibonacciの計算テスト_一般項")
     @ParameterizedTest(name = "{0}を渡したら{1}を返す")
     @MethodSource("fibonacciTestCases")
     void test_FibonacciCalculation_GeneralTerm(int input, int expected) {
@@ -88,11 +88,68 @@ class AppTest {
                 arguments(-5)
         );
     }
+    
+    @DisplayName("オーバーフローテスト_再帰処理")
+    @Test
+    void test_Overflow_Recursive() {
+        Fibonacci command = new Fibonacci(new FibonacciRecursive());
+        assertThrows(FibonacciOverflowException.class, () -> command.exec(93));
+    }
+    
+    @DisplayName("オーバーフローテスト_ループ処理")
+    @Test
+    void test_Overflow_Loop() {
+        Fibonacci command = new Fibonacci(new FibonacciLoop());
+        assertThrows(FibonacciOverflowException.class, () -> command.exec(93));
+    }
+    
+    @DisplayName("オーバーフローテスト_一般項")
+    @Test
+    void test_Overflow_GeneralTerm() {
+        Fibonacci command = new Fibonacci(new FibonacciGeneralTerm());
+        assertThrows(FibonacciOverflowException.class, () -> command.exec(93));
+    }
+    
+    @DisplayName("境界値テスト_最大安全値")
+    @Test
+    void test_Max_Safe_Value() {
+        // 92はオーバーフローしない最大値
+        Fibonacci commandRecursive = new Fibonacci(new FibonacciRecursive());
+        Fibonacci commandLoop = new Fibonacci(new FibonacciLoop());
+        
+        assertDoesNotThrow(() -> commandRecursive.exec(92));
+        assertDoesNotThrow(() -> commandLoop.exec(92));
+    }
+}
 
+/**
+ * フィボナッチ計算のオーバーフロー例外
+ */
+class FibonacciOverflowException extends ArithmeticException {
+    public FibonacciOverflowException(String message) {
+        super(message);
+    }
 }
 
 interface FibonacciCalculator {
     long exec(long number);
+    
+    /**
+     * 加算処理でオーバーフローを検出する
+     * @param a 第1項
+     * @param b 第2項
+     * @return 和
+     * @throws FibonacciOverflowException オーバーフロー発生時
+     */
+    default long addWithOverflowCheck(long a, long b) {
+        // オーバーフロー検出：a > 0, b > 0 で a + b < 0 の場合はオーバーフロー
+        // またはa < 0, b < 0 で a + b > 0 の場合もオーバーフロー
+        if ((a > 0 && b > 0 && Long.MAX_VALUE - a < b) || 
+            (a < 0 && b < 0 && Long.MIN_VALUE - a > b)) {
+            throw new FibonacciOverflowException("フィボナッチ数列の計算でオーバーフローが発生しました: " + a + " + " + b);
+        }
+        return a + b;
+    }
 }
 
 class Fibonacci {
@@ -105,6 +162,10 @@ class Fibonacci {
     public long exec(long number) {
         if (number < 0) {
             throw new IllegalArgumentException("入力値は0以上である必要があります");
+        }
+        // 92を超える場合は事前にチェック（既知の制限値）
+        if (number > 92) {
+            throw new FibonacciOverflowException("入力値が大きすぎます：long型の範囲を超えるフィボナッチ数になります（最大92まで）");
         }
         return algorithm.exec(number);
     }
@@ -124,7 +185,9 @@ class FibonacciRecursive implements FibonacciCalculator {
         if (number == 1) return 1;
 
         // 再帰的に計算し、結果をキャッシュに保存
-        long result = exec(number - 1) + exec(number - 2);
+        long a = exec(number - 1);
+        long b = exec(number - 2);
+        long result = addWithOverflowCheck(a, b);
         cache.put(number, result);
 
         return result;
@@ -140,7 +203,7 @@ class FibonacciLoop implements FibonacciCalculator {
         long b = 1;
         long c;
         for (long i = 2; i <= number; i++) {
-            c = a + b;
+            c = addWithOverflowCheck(a, b);
             a = b;
             b = c;
         }
@@ -150,6 +213,9 @@ class FibonacciLoop implements FibonacciCalculator {
 
 class FibonacciGeneralTerm implements FibonacciCalculator {
     public long exec(long number) {
+        if (number > 92) {
+            throw new FibonacciOverflowException("入力値が大きすぎます：long型の範囲を超えるフィボナッチ数になります（最大92まで）");
+        }
         double sqrt5 = Math.sqrt(5);
         double phi = (1 + sqrt5) / 2;
         return Math.round(Math.pow(phi, number) / sqrt5);
