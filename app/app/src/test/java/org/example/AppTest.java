@@ -53,19 +53,22 @@ class AppTest {
     @DisplayName("大きな数字_再起処理による実装")
     @Test void test_Large_Number() {
         Fibonacci command = new Fibonacci(new FibonacciRecursive());
-        assertEquals(102_334_155, command.exec(40));
+        assertEquals(7_540_113_804_746_346_429L, command.exec(92));
     }
+
 
     @DisplayName("大きな数字_ループ処理による実装")
     @Test void test_Large_Number_By_Loop() {
         Fibonacci command = new Fibonacci(new FibonacciLoop());
         assertEquals(102_334_155, command.exec(40));
+        assertEquals(7_540_113_804_746_346_429L, command.exec(92));
     }
 
     @DisplayName("大きな数字_一般項による実装")
     @Test void test_Large_Number_By_General() {
         Fibonacci command = new Fibonacci(new FibonacciGeneralTerm());
         assertEquals(102_334_155, command.exec(40));
+        assertEquals(7_540_113_804_746_369_024L, command.exec(92));
     }
 
     @DisplayName("非負整数以外の値を渡した場合")
@@ -89,7 +92,7 @@ class AppTest {
 }
 
 interface FibonacciCalculator {
-    int exec(int number);
+    long exec(long number);
 }
 
 class Fibonacci {
@@ -99,7 +102,7 @@ class Fibonacci {
         this.algorithm = algorithm;
     }
 
-    public int exec(int number) {
+    public long exec(long number) {
         if (number < 0) {
             throw new IllegalArgumentException("入力値は0以上である必要があります");
         }
@@ -108,9 +111,9 @@ class Fibonacci {
 }
 
 class FibonacciRecursive implements FibonacciCalculator {
-    private final Map<Integer, Integer> cache = new HashMap<>();
+    private final Map<Long, Long> cache = new HashMap<>();
 
-    public int exec(int number) {
+    public long exec(long number) {
         // 既に計算済みの値であればキャッシュから返す
         if (cache.containsKey(number)) {
             return cache.get(number);
@@ -121,7 +124,7 @@ class FibonacciRecursive implements FibonacciCalculator {
         if (number == 1) return 1;
 
         // 再帰的に計算し、結果をキャッシュに保存
-        int result = exec(number - 1) + exec(number - 2);
+        long result = exec(number - 1) + exec(number - 2);
         cache.put(number, result);
 
         return result;
@@ -129,11 +132,11 @@ class FibonacciRecursive implements FibonacciCalculator {
 }
 
 class FibonacciLoop implements FibonacciCalculator {
-    public int exec(int number) {
-        int a = 0;
-        int b = 1;
-        int c = 0;
-        for (int i = 0; i < number; i++) {
+    public long exec(long number) {
+        long a = 0;
+        long b = 1;
+        long c = 0;
+        for (long i = 0; i < number; i++) {
             a = b;
             b = c;
             c = a + b;
@@ -143,9 +146,9 @@ class FibonacciLoop implements FibonacciCalculator {
 }
 
 class FibonacciGeneralTerm implements FibonacciCalculator {
-    public int exec(int number) {
+    public long exec(long number) {
         double sqrt5 = Math.sqrt(5);
         double phi = (1 + sqrt5) / 2;
-        return (int) Math.round(Math.pow(phi, number) / sqrt5);
+        return Math.round(Math.pow(phi, number) / sqrt5);
     }
 }
