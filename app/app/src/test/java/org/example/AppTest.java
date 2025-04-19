@@ -228,9 +228,36 @@ class FibonacciLoop implements FibonacciCalculator {
  * </p>
  */
 class FibonacciGeneralTerm implements FibonacciCalculator {
+    // フィボナッチ数列のLong型で表現可能な最大値
+    private static final long MAX_FIBONACCI = 7_540_113_804_746_369_024L; // 93番目の値に近い
+
     public long exec(long number) {
+        if (number == 0) return 0;
+        if (number == 1) return 1;
+        
+        // 92以下はメイン処理で計算
         double sqrt5 = Math.sqrt(5);
         double phi = (1 + sqrt5) / 2;
-        return Math.round(Math.pow(phi, number) / sqrt5);
+        
+        // 大きな数字のオーバーフローチェック
+        // 数学的に検証：フィボナッチ数列は約 Φ^n/√5 で成長するため、
+        // 結果が長すぎないか、また計算中にオーバーフローが起きていないか確認
+        
+        double result = Math.pow(phi, number) / sqrt5;
+        
+        // 浮動小数点値がLong.MAXより大きいか、または
+        // 結果が正確に表現できない場合はオーバーフロー
+        if (result > Long.MAX_VALUE || Double.isInfinite(result) || Double.isNaN(result)) {
+            throw new FibonacciOverflowException("フィボナッチ数列の計算でオーバーフローが発生しました: n=" + number);
+        }
+        
+        // 補足チェック: 92を超える場合、既知の制限値よりも大きくなるためオーバーフロー
+        // Fibonacci.exec()でもチェックしているが、一貫性のためここでも実装
+        long roundedResult = Math.round(result);
+        if (roundedResult > MAX_FIBONACCI) {
+            throw new FibonacciOverflowException("フィボナッチ数列の計算でオーバーフローが発生しました: 結果が大きすぎます");
+        }
+
+        return roundedResult;
     }
 }
