@@ -213,6 +213,20 @@ class FibonacciLoop implements FibonacciCalculator {
     }
 }
 
+/**
+ * ビネの公式（一般項）を使用してフィボナッチ数列を計算するクラス。
+ * <p>
+ * 注意: この実装は浮動小数点演算を使用しているため、特に大きな数値（例：92）では
+ * 再帰処理やループ処理による計算結果と微小な差異が生じる場合があります。
+ * これは浮動小数点演算の精度限界によるものであり、厳密な整数計算が必要な場合は
+ * {@link FibonacciRecursive}または{@link FibonacciLoop}の使用を検討してください。
+ * </p>
+ * <p>
+ * 例: n=92の場合<br>
+ * 再帰/ループ実装: 7,540,113,804,746,346,429<br>
+ * 一般項実装: 7,540,113,804,746,369,024<br>
+ * </p>
+ */
 class FibonacciGeneralTerm implements FibonacciCalculator {
     public long exec(long number) {
         double sqrt5 = Math.sqrt(5);
