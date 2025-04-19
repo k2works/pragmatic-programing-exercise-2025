@@ -133,15 +133,18 @@ class FibonacciRecursive implements FibonacciCalculator {
 
 class FibonacciLoop implements FibonacciCalculator {
     public long exec(long number) {
+        if (number == 0) return 0;
+        if (number == 1) return 1;
+
         long a = 0;
         long b = 1;
-        long c = 0;
-        for (long i = 0; i < number; i++) {
+        long c;
+        for (long i = 2; i <= number; i++) {
+            c = a + b;
             a = b;
             b = c;
-            c = a + b;
         }
-        return c;
+        return b;
     }
 }
 
