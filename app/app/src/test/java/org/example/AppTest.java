@@ -213,9 +213,6 @@ class FibonacciLoop implements FibonacciCalculator {
 
 class FibonacciGeneralTerm implements FibonacciCalculator {
     public long exec(long number) {
-        if (number > 92) {
-            throw new FibonacciOverflowException("入力値が大きすぎます：long型の範囲を超えるフィボナッチ数になります（最大92まで）");
-        }
         double sqrt5 = Math.sqrt(5);
         double phi = (1 + sqrt5) / 2;
         return Math.round(Math.pow(phi, number) / sqrt5);
