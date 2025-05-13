@@ -1,4 +1,4 @@
-(ns test.primefactors.core-test
+(ns primefactors.core-test
   (:require [clojure.test :refer [deftest is testing]]
             [primefactors.core :refer [prime-factors]]))
 
