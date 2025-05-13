@@ -48,7 +48,7 @@ This implementation returns the prime factors in ascending order.
 This project uses [speclj](https://github.com/slagyr/speclj) for testing. To run the tests:
 
 ```bash
-clojure -M:test
+clojure -M:spec
 ```
 
 The tests verify that the prime-factors function correctly decomposes various numbers into their prime factors.
