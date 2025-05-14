@@ -1,12 +1,9 @@
 (ns primefactors.core)
 
-(defn prime-factors
-  "Returns a sequence of prime factors of n in ascending order."
-  [n]
-  (loop [factors []
-         n n
-         divisor 2]
-    (cond
-      (> divisor n) factors
-      (zero? (mod n divisor)) (recur (conj factors divisor) (/ n divisor) divisor)
-      :else (recur factors n (inc divisor)))))
+(defn prime-factors-of [n]
+  (loop [n n divisor 2 factors []]
+    (if (> n 1)
+      (if (zero? (rem n divisor))
+        (recur (quot n divisor) divisor (conj factors divisor))
+        (recur n (inc divisor) factors))
+      factors)))
