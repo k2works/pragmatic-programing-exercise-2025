@@ -2,13 +2,15 @@
   (:require [clojure.test :refer :all]
             [bowlinggame.core :refer :all]))
 
-(defn roll-many
-  "Helper function to roll the same number of pins multiple times."
-  [game n pins]
-  (reduce (fn [g _] (roll g pins)) game (range n)))
-
 (deftest bowlinggame-test
   (testing "should score 0 for a gutter game"
-    (let [game (roll-many (new-game) 20 0)]
-      (is (= 0 (score game)))))
+      (is (= 0 (score (repeat 20 0)))))
+  (testing "should score 17 for spare"
+      (is (= 24 (score (concat [5 5 7] (repeat 17 0))))))
+  (testing "should score 20 for all ones"
+      (is (= 20 (score (repeat 20 1)))))
+  (testing "should score 20 for strike"
+      (is (= 20 (score (concat [10 2 3] (repeat 16 0))))))
+  (testing "should score 300 for perfect game"
+      (is (= 300 (score (repeat 12 10)))))
   )
