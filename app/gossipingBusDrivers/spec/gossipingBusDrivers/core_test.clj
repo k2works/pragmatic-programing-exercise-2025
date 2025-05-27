@@ -3,15 +3,27 @@
             [gossipingBusDrivers.core :refer :all]))
 
 (deftest gossipingBusDrivers-test
-  (testing "drives one bus at one stop")
+  (testing "drives one bus at one stop"
     (let [driver (make-driver "d1" [:s1] #{:r1})
           world [driver]
           new-world (drive world)]
       (is (= 1 (count new-world)))
-      (is (= :s1 (-> new-world first :route first))))
-  (testing "drives one bus at two stops")
-  (let [driver (make-driver "d1" [:s1 :s2] #{:r1})
+      (is (= :s1 (-> new-world first :route first)))))
+  (testing "drives one bus at two stops"
+    (let [driver (make-driver "d1" [:s1 :s2] #{:r1})
           world [driver]
           new-world (drive world)]
       (is (= 1 (count new-world)))
       (is (= :s2 (-> new-world first :route first)))))
+  (testing "drives two buses at some stops"
+    (let [d1 (make-driver "d1" [:s1 :s2] #{:r1})
+          d2 (make-driver "d2" [:s1 :s3 :s2] #{:r2})
+          world [d1 d2]
+          new-1 (drive world)
+          new-2 (drive new-1)]
+      (is (= 2 (count new-1)))
+      (is (= :s2 (-> new-1 first :route first)))
+      (is (= :s3 (-> new-1 second :route first)))
+      (is (= 2 (count new-2)))
+      (is (= :s1 (-> new-2 first :route first)))
+      (is (= :s2 (-> new-2 second :route first))))))
