@@ -4,6 +4,16 @@
 (defn make-driver [name route rumors]
   (assoc {} :name name :route (cycle route) :rumors rumors))
 
+(defn get-stops [world]
+  (loop [world world
+         stops {}]
+    (if (empty? world)
+      stops
+      (let [driver (first world)
+            stop (first (:route driver))
+            stops (update stops stop conj driver)]
+        (recur (rest world) stops)))))
+
 (defn drive [world]
   (->> world
        (map (fn [driver]

@@ -26,4 +26,13 @@
       (is (= :s3 (-> new-1 second :route first)))
       (is (= 2 (count new-2)))
       (is (= :s1 (-> new-2 first :route first)))
-      (is (= :s2 (-> new-2 second :route first))))))
+      (is (= :s2 (-> new-2 second :route first)))))
+  (testing "gets stops"
+    (let [drivers #{{:name "d1" :route [:s1]}
+                    {:name "d2" :route [:s1]}
+                    {:name "d3" :route [:s2]}}]
+      (is (= {:s1 [{:name "d1" :route [:s1]}
+                   {:name "d2" :route [:s1]}]
+              :s2 [{:name "d3" :route [:s2]}]}
+             (get-stops drivers)))))
+  )

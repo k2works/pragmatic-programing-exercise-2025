@@ -26,4 +26,14 @@
                 (should= :s3 (-> new-1 second :route first))
                 (should= 2 (count new-2))
                 (should= :s1 (-> new-2 first :route first))
-                (should= :s2 (-> new-2 second :route first)))))
+                (should= :s2 (-> new-2 second :route first))))
+          (it "gets stops"
+              (let [drivers #{{:name "d1" :route [:s1]}
+                              {:name "d2" :route [:s1]}
+                              {:name "d3" :route [:s2]}}]
+                (should= {:s1 [{:name "d1" :route [:s1]}
+                               {:name "d2" :route [:s1]}]
+                          :s2 [{:name "d3" :route [:s2]}]}
+                         (get-stops drivers)))
+              )
+          )
