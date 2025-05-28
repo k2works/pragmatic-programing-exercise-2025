@@ -40,4 +40,12 @@
             {:name "d2" :rumors #{:r2 :r1}}]
            (merge-rumors [{:name "d1" :rumors #{:r1}}
                           {:name "d2" :rumors #{:r2}}]))))
+  (testing "shares gossip when drivers are at same stop"
+    (let [d1 (make-driver "d1" [:s1 :s2] #{:r1})
+          d2 (make-driver "d2" [:s1 :s2] #{:r2})
+          world [d1 d2]
+          new-world (drive world)]
+      (is (= 2 (count new-world)))
+      (is (= #{:r1 :r2} (-> new-world first :rumors)))
+      (is (= #{:r1 :r2} (-> new-world second :rumors)))))
   )

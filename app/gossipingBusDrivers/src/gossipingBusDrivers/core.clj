@@ -20,9 +20,22 @@
     (map #(assoc % :rumors all-rumors) drivers)))
 
 (defn drive [world]
-  (->> world
-       (map (fn [driver]
-              (let [current-route (:route driver)
-                    next-route (rest current-route)]
-                (assoc driver :route next-route))))
-       (filter #(not-empty (:route %)))))
+  (let [move-drivers (->> world
+                          (map (fn [driver]
+                                 (let [current-route (:route driver)
+                                       next-route (rest current-route)]
+                                   (assoc driver :route next-route))))
+                          (filter #(not-empty (:route %))))
+
+        stops (get-stops move-drivers)
+
+        gossip-shared-drivers (reduce (fn [drivers [_ drivers-at-stop]]
+                                        (if (> (count drivers-at-stop) 1)
+                                          (let [updated (merge-rumors drivers-at-stop)]
+                                            (concat (remove (fn [d] (some #(= (:name d) (:name %)) drivers-at-stop))
+                                                            drivers)
+                                                    updated))
+                                          drivers))
+                                      move-drivers
+                                      stops)]
+    gossip-shared-drivers))
