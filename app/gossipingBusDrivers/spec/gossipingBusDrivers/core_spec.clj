@@ -36,4 +36,9 @@
                           :s2 [{:name "d3" :route [:s2]}]}
                          (get-stops drivers)))
               )
+          (it "merges rumors"
+              (should= [{:name "d1" :rumors #{:r2 :r1}}
+                        {:name "d2" :rumors #{:r2 :r1}}]
+                       (merge-rumors [{:name "d1" :rumors #{:r1}}
+                                      {:name "d2" :rumors #{:r2}}])))
           )

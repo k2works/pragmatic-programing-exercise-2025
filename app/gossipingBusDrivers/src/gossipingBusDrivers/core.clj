@@ -14,6 +14,11 @@
             stops (update stops stop conj driver)]
         (recur (rest world) stops)))))
 
+(defn merge-rumors [drivers]
+  (let [rumors (map :rumors drivers)
+        all-rumors (apply set/union rumors)]
+    (map #(assoc % :rumors all-rumors) drivers)))
+
 (defn drive [world]
   (->> world
        (map (fn [driver]
