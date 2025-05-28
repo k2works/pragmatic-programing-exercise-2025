@@ -39,3 +39,11 @@
                                       move-drivers
                                       stops)]
     gossip-shared-drivers))
+
+  (defn drive-till-all-rumors-spread [world]
+    (loop [world (drive world)
+           time 1]
+      (cond
+        (> time 480) :never
+        (apply = (map :rumors world)) time
+        :else (recur (drive world) (inc time)))))

@@ -49,4 +49,12 @@
                 (should= 2 (count new-world))
                 (should= #{:r1 :r2} (-> new-world first :rumors))
                 (should= #{:r1 :r2} (-> new-world second :rumors))))
-          )
+          (it "passes acceptance test 1"
+              (let [world [(make-driver "d1" [3 1 2 3] #{1})
+                           (make-driver "d2" [3 2 3 1] #{2})
+                           (make-driver "d3" [4 2 3 4 5] #{3})]]
+                (should= 6 (drive-till-all-rumors-spread world))))
+          (it "passes acceptance test 2"
+              (let [world [(make-driver "d1" [2 1 2] #{1})
+                           (make-driver "d2" [5 2 8] #{2})]]
+                (should= :never (drive-till-all-rumors-spread world)))))
