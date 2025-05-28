@@ -9,12 +9,14 @@
           new-world (drive world)]
       (is (= 1 (count new-world)))
       (is (= :s1 (-> new-world first :route first)))))
+
   (testing "drives one bus at two stops"
     (let [driver (make-driver "d1" [:s1 :s2] #{:r1})
           world [driver]
           new-world (drive world)]
       (is (= 1 (count new-world)))
       (is (= :s2 (-> new-world first :route first)))))
+
   (testing "drives two buses at some stops"
     (let [d1 (make-driver "d1" [:s1 :s2] #{:r1})
           d2 (make-driver "d2" [:s1 :s3 :s2] #{:r2})
@@ -27,6 +29,7 @@
       (is (= 2 (count new-2)))
       (is (= :s1 (-> new-2 first :route first)))
       (is (= :s2 (-> new-2 second :route first)))))
+
   (testing "gets stops"
     (let [drivers #{{:name "d1" :route [:s1]}
                     {:name "d2" :route [:s1]}
@@ -35,11 +38,13 @@
                    {:name "d2" :route [:s1]}]
               :s2 [{:name "d3" :route [:s2]}]}
              (get-stops drivers)))))
+
   (testing "merges rumors"
     (is (= [{:name "d1" :rumors #{:r2 :r1}}
             {:name "d2" :rumors #{:r2 :r1}}]
            (merge-rumors [{:name "d1" :rumors #{:r1}}
                           {:name "d2" :rumors #{:r2}}]))))
+
   (testing "shares gossip when drivers are at same stop"
     (let [d1 (make-driver "d1" [:s1 :s2] #{:r1})
           d2 (make-driver "d2" [:s1 :s2] #{:r2})
@@ -48,13 +53,14 @@
       (is (= 2 (count new-world)))
       (is (= #{:r1 :r2} (-> new-world first :rumors)))
       (is (= #{:r1 :r2} (-> new-world second :rumors)))))
+
   (testing "passes acceptance test 1"
     (let [world [(make-driver "d1" [3 1 2 3] #{1})
                  (make-driver "d2" [3 2 3 1] #{2})
                  (make-driver "d3" [4 2 3 4 5] #{3})]]
       (is (= 6 (drive-till-all-rumors-spread world)))))
+
   (testing "passes acceptance test 2"
     (let [world [(make-driver "d1" [2 1 2] #{1})
                  (make-driver "d2" [5 2 8] #{2})]]
-      (is (= :never (drive-till-all-rumors-spread world)))))
-  )
+      (is (= :never (drive-till-all-rumors-spread world))))))

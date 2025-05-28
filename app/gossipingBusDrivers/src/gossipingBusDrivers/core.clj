@@ -4,6 +4,12 @@
 (defn make-driver [name route rumors]
   (assoc {} :name name :route (cycle route) :rumors rumors))
 
+(defn move-driver [driver]
+  (update driver :route rest))
+
+(defn move-drivers [world]
+  (map move-driver world))
+
 (defn get-stops [world]
   (loop [world world
          stops {}]
@@ -19,26 +25,13 @@
         all-rumors (apply set/union rumors)]
     (map #(assoc % :rumors all-rumors) drivers)))
 
+(defn spread-rumors [world]
+  (let [stops-with-drivers (get-stops world)
+        drivers-by-stop (vals stops-with-drivers)]
+    (flatten (map merge-rumors drivers-by-stop))))
+
 (defn drive [world]
-  (let [move-drivers (->> world
-                          (map (fn [driver]
-                                 (let [current-route (:route driver)
-                                       next-route (rest current-route)]
-                                   (assoc driver :route next-route))))
-                          (filter #(not-empty (:route %))))
-
-        stops (get-stops move-drivers)
-
-        gossip-shared-drivers (reduce (fn [drivers [_ drivers-at-stop]]
-                                        (if (> (count drivers-at-stop) 1)
-                                          (let [updated (merge-rumors drivers-at-stop)]
-                                            (concat (remove (fn [d] (some #(= (:name d) (:name %)) drivers-at-stop))
-                                                            drivers)
-                                                    updated))
-                                          drivers))
-                                      move-drivers
-                                      stops)]
-    gossip-shared-drivers))
+  (-> world move-drivers spread-rumors))
 
   (defn drive-till-all-rumors-spread [world]
     (loop [world (drive world)
