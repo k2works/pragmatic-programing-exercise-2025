@@ -15,4 +15,19 @@
                            :name "name"
                            :address "home"
                            :amount 5000}]
-                         (payroll tody db)))))
+                         (payroll tody db))))
+          (it "pays one hourly employee on Friday by Direct Deposit"
+              (let [employees [{:id "empid"
+                                :schedule :weekly
+                                :pay-class [:hourly 15]
+                                :disposition [:deposit "routing" "account"]}]
+                    time-cards {"empid" [["Nov 12 2022" 80/10]]}
+                    db {:employees employees :time-cards time-cards}
+                    friday (parse-date "Nov 26 2021")]
+                (should= [{:type :direct-deposit
+                           :id "emp2"
+                           :name "name"
+                           :address "bank-account"
+                           :amount 20}]
+                         (payroll friday db))))
+          )

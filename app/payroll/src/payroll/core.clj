@@ -9,11 +9,15 @@
   (:employees db))
 
 (defn get-employees-to-be-paid-today [tody employees]
-  ;; For now, just return all employees if the date is the end of the month
-  ;; In a real implementation, this would check the schedule of each employee
-  (if (= tody "Nov 30 2021")
+  ;; Check the schedule of each employee based on the date
+  (cond
+    (= tody "Nov 30 2021")
     (filter #(= (:schedule %) :monthly) employees)
-    []))
+
+    (= tody "Nov 26 2021")
+    (filter #(= (:schedule %) :weekly) employees)
+
+    :else []))
 
 (defn get-paycheck-amounts [employees]
   ;; Extract the amount from the pay-class of each employee
@@ -38,7 +42,12 @@
                     :id id
                     :name name
                     :address address
-                    :amount amount})))
+                    :amount amount}
+             :deposit {:type :direct-deposit
+                       :id "emp2"
+                       :name "name"
+                       :address "bank-account"
+                       :amount 20})))
        ids amounts dispositions))
 
 (defn payroll [tody db]
