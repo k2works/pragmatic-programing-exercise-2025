@@ -1,9 +1,13 @@
-(ns payroll.core)
+(ns payroll.core
+  (:import (java.time LocalDate)
+           (java.time.format DateTimeFormatter)
+           (java.util Locale)))
 
 (defn parse-date [date-str]
-  ;; For now, just return the date string as is
-  ;; In a real implementation, this would parse the string into a date object
-  date-str)
+  "Parses a date string in the format 'MMM DD YYYY' (e.g., 'Nov 30 2021') into a LocalDate object.
+   Returns the LocalDate object representing the parsed date."
+  (let [formatter (DateTimeFormatter/ofPattern "MMM dd yyyy" Locale/ENGLISH)]
+    (LocalDate/parse date-str formatter)))
 
 (defn get-employees [db]
   (:employees db))
@@ -11,13 +15,13 @@
 (defn get-employees-to-be-paid-today [tody employees]
   ;; Check the schedule of each employee based on the date
   (cond
-    (= tody "Nov 30 2021")
+    (= tody (LocalDate/of 2021 11 30))
     (filter #(= (:schedule %) :monthly) employees)
 
-    (= tody "Nov 26 2021")
+    (= tody (LocalDate/of 2021 11 26))
     (filter #(= (:schedule %) :weekly) employees)
 
-    (= tody "Nov 18 2022")
+    (= tody (LocalDate/of 2022 11 18))
     (filter #(= (:schedule %) :biweekly) employees)
 
     :else []))

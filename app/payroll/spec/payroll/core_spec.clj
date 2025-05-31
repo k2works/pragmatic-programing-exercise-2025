@@ -1,6 +1,16 @@
 (ns payroll.core-spec
     (:require [speclj.core :refer :all]
-      [payroll.core :refer :all]))
+              [payroll.core :refer :all])
+    (:import (java.time LocalDate)))
+
+(describe "parse-date"
+          (it "correctly parses date strings"
+              (should= (LocalDate/of 2021 11 30) (parse-date "Nov 30 2021"))
+              (should= (LocalDate/of 2021 11 26) (parse-date "Nov 26 2021"))
+              (should= (LocalDate/of 2022 11 18) (parse-date "Nov 18 2022"))
+              (should= (LocalDate/of 2023 1 15) (parse-date "Jan 15 2023"))
+              (should= (LocalDate/of 2020 2 29) (parse-date "Feb 29 2020")) ; Leap year
+              (should= (LocalDate/of 2022 12 31) (parse-date "Dec 31 2022"))))
 
 (describe "Payroll"
           (it "pays one salaried employee at end of month by mail"
