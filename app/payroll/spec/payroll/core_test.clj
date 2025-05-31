@@ -30,4 +30,16 @@
                :name "name"
                :address "bank-account"
                :amount 20}]
-             (payroll friday db))))))
+             (payroll friday db)))))
+  (testing "pays one commissioned employee on an even Friday by Paymaster"
+    (let [employees [{:id "empid"
+                      :schedule :biweekly
+                      :pay-class [:commissioned 100 5/100]
+                      :disposition [:paymaster "paymaster"]}]
+          sales-receipts {"empid" [["Now 12 2022" 15000]]}
+          db {:employees employees :sales-receipts sales-receipts}
+          friday (parse-date "Nov 18 2022")]
+    (is (= [{:type :paymaster
+             :id "empid"
+             :paymaster "paymaster"
+             :amount 850}])))))
