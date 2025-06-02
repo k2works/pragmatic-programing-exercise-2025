@@ -72,7 +72,7 @@
                             account (nth disposition 2)]
                         {:type :deposit
                          :id id
-                         :rounding routing
+                         :routing routing
                          :account account
                          :amount amount})
              :paymaster (let [paymaster (second disposition)]

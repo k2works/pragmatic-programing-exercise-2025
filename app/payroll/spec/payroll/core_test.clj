@@ -37,8 +37,8 @@
           friday (parse-date "Nov 18 2022")]
       (is (= [{:type :deposit
                :id "empid"
-               :rounding "routing"
-                :account "account"
+               :routing "routing"
+               :account "account"
                :amount 120}]
              (payroll friday db)))))
   (testing "pays one commissioned employee on an even Friday by Paymaster"
