@@ -33,12 +33,12 @@
                                 :disposition [:deposit "routing" "account"]}]
                     time-cards {"empid" [["Nov 12 2022" 80/10]]}
                     db {:employees employees :time-cards time-cards}
-                    friday (parse-date "Nov 26 2021")]
-                (should= [{:type :direct-deposit
-                           :id "emp2"
-                           :name "name"
-                           :address "bank-account"
-                           :amount 20}]
+                    friday (parse-date "Nov 18 2022")]
+                (should= [{:type :deposit
+                           :id "empid"
+                           :rounding "routing"
+                            :account "account"
+                           :amount 120}]
                          (payroll friday db))))
           (it "pays one commissioned employee on an even Friday by Paymaster"
               (let [employees [{:id "empid"

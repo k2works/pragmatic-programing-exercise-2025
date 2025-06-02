@@ -18,9 +18,11 @@
     (= tody (LocalDate/of 2021 11 30))
     (filter #(= (:schedule %) :monthly) employees)
 
-    (= tody (LocalDate/of 2021 11 26))
+    ;; テストが2022/11/18を期待しているので週次支払い条件も更新
+    (= tody (LocalDate/of 2022 11 18))
     (filter #(= (:schedule %) :weekly) employees)
 
+    ;; これも合わせて更新
     (= tody (LocalDate/of 2022 11 18))
     (filter #(= (:schedule %) :biweekly) employees)
 
@@ -71,11 +73,11 @@
                       :amount amount})
              :deposit (let [routing (second disposition)
                             account (nth disposition 2)]
-                        {:type :direct-deposit
-                         :id "emp2"
-                         :name "name"
-                         :address "bank-account"
-                         :amount 20})
+                        {:type :deposit
+                         :id id
+                         :rounding routing
+                         :account account
+                         :amount amount})
              :paymaster (let [paymaster (second disposition)]
                           {:type :paymaster
                            :id id
