@@ -13,7 +13,7 @@
   (:employees db))
 
 (defn get-employees-to-be-paid-today [tody employees]
-  ;; Check the schedule of each employee based on the date
+  "Check the schedule of each employee based on the date"
   (cond
     (= tody (LocalDate/of 2021 11 30))
     (filter #(= (:schedule %) :monthly) employees)
@@ -26,7 +26,7 @@
     :else []))
 
 (defn get-paycheck-amounts [employees db]
-  ;; Calculate the amount based on the pay-class of each employee
+  "Calculate the amount based on the pay-class of each employee"
   (map (fn [employee]
          (let [pay-class (:pay-class employee)
                pay-type (first pay-class)
@@ -49,15 +49,15 @@
        employees))
 
 (defn get-ids [employees]
-  ;; Extract the id of each employee
+  "Extract the id of each employee"
   (map :id employees))
 
 (defn get-dispositions [employees]
-  ;; Extract the disposition of each employee
+  "Extract the disposition of each employee"
   (map :disposition employees))
 
 (defn send-paychecks [ids amounts dispositions]
-  ;; Create a paycheck for each employee
+  "Create a paycheck for each employee"
   (map (fn [id amount disposition]
          (let [disp-type (first disposition)]
            (case disp-type
