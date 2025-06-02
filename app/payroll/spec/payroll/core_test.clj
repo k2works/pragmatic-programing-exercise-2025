@@ -52,5 +52,6 @@
     (is (= [{:type :paymaster
              :id "empid"
              :paymaster "paymaster"
-             :amount 850}]))))
+             :amount 850}]
+           (payroll friday db)))))
   )

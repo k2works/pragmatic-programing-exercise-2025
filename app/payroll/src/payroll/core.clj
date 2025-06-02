@@ -18,13 +18,10 @@
     (= tody (LocalDate/of 2021 11 30))
     (filter #(= (:schedule %) :monthly) employees)
 
-    ;; テストが2022/11/18を期待しているので週次支払い条件も更新
     (= tody (LocalDate/of 2022 11 18))
-    (filter #(= (:schedule %) :weekly) employees)
-
-    ;; これも合わせて更新
-    (= tody (LocalDate/of 2022 11 18))
-    (filter #(= (:schedule %) :biweekly) employees)
+    (concat 
+      (filter #(= (:schedule %) :weekly) employees)
+      (filter #(= (:schedule %) :biweekly) employees))
 
     :else []))
 
