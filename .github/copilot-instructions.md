@@ -5,6 +5,8 @@
 - Notion Github Slack AtlassianなどのAPIを統合するためのMCP Serverを使用します。このサーバーは、GitHub Copilotがプロジェクトの開発日誌やGitHub Issueの管理を支援するために必要なAPIを提供します。
 - `C:\Users\PC202411-1\AppData\Local\github-copilot\intellij\mcp.json` に記載されているMCP Serverの設定を利用します。いちいちスクリプトを作成しません。
 - Notionを指定した場合は、MCP Serverの `notionAPI` を使用して、日誌の登録やデータベースの操作を行います。
+  - Notionの日誌のタイトルは、`YYYY年MM月DD日` の形式で作成します。
+  - Notionの日誌の作成者は、GitHub のユーザー名を使用します。
 - GitHubを指定した場合は、MCP Serverの `githubAPI` を使用して、Issueの取得や管理を行います。
 - Slackを指定した場合は、MCP Serverの `slackAPI` を使用して、通知やメッセージの送信を行います。
 - Atlassianを指定した場合は、MCP Serverの `atlassianAPI` を使用して、JiraやConfluenceとの連携を行います。
