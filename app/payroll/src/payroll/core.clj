@@ -1,4 +1,5 @@
 (ns payroll.core
+  (:require [payroll.interface :refer :all])
   (:import (java.time LocalDate)
            (java.time.format DateTimeFormatter)
            (java.util Locale)))
@@ -8,17 +9,6 @@
    Returns the LocalDate object representing the parsed date."
   (let [formatter (DateTimeFormatter/ofPattern "MMM dd yyyy" Locale/ENGLISH)]
     (LocalDate/parse date-str formatter)))
-
-(defn get-pay-class [employee]
-  (first (:pay-class employee)))
-
-(defn get-disposition [paycheck-directive]
-  "Extract the disposition of each employee"
-  (first (:disposition paycheck-directive)))
-
-(defmulti is-tody-payday :schedule)
-(defmulti calc-pay get-pay-class)
-(defmulti dispose get-disposition)
 
 (defn get-employees-to-be-paid-today [today employees]
   "Check the schedule of each employee based on the date"
