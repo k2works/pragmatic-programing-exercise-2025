@@ -1,4 +1,4 @@
-(ns payroll.core-test
+(ns payroll.payroll-test
  (:require [clojure.test :refer :all]
            [payroll.schedule :refer [parse-date]]
            [payroll.payroll :refer [payroll]])

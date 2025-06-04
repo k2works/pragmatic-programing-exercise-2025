@@ -1,4 +1,4 @@
-(ns payroll.core-spec
+(ns payroll.payroll-spec
     (:require [speclj.core :refer :all]
               [payroll.schedule :refer [parse-date]]
               [payroll.payroll :refer [payroll]])
