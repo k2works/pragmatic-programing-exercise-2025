@@ -1,11 +1,8 @@
 (ns payroll.payroll
   (:require [payroll.interface :refer :all]
-            [payroll.implementation :refer [get-employees
-                                  get-employees-to-be-paid-today
-                                  get-paycheck-amounts
-                                  get-ids
-                                  get-dispositions
-                                  send-paychecks]]))
+            [payroll.schedule :refer [get-employees-to-be-paid-today]]
+            [payroll.classification :refer [get-employees get-paycheck-amounts]]
+            [payroll.disposition :refer [get-ids get-dispositions send-paychecks]]))
 
 (defn payroll [tody db]
   (let [employees (get-employees db)
