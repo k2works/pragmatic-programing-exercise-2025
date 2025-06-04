@@ -114,6 +114,83 @@
   "Extract the id of each employee"
   (map :id employees))
 
+;; 月給制の社員は月末に支払い
+(defmethod is-tody-payday :monthly [_ today]
+  (let [last-day-of-month (.lengthOfMonth today)
+        day-of-month (.getDayOfMonth today)]
+    (= day-of-month last-day-of-month)))
+
+;; 週給制の社員は毎週金曜日に支払い
+(defmethod is-tody-payday :weekly [_ today]
+  (= (.getValue (.getDayOfWeek today)) 5)) ;; 5は金曜日
+
+;; 隔週給制の社員は隔週金曜日に支払い
+(defmethod is-tody-payday :biweekly [_ today]
+  (and
+    (= (.getValue (.getDayOfWeek today)) 5) ;; 金曜日
+    (even? (quot (.getDayOfYear today) 7)))) ;; 偶数週
+
+;; 郵送による給与支払い
+(defmethod dispose :mail [paycheck-directive]
+  (let [id (:id paycheck-directive)
+        amount (:amount paycheck-directive)
+        name (second (:disposition paycheck-directive))
+        address (nth (:disposition paycheck-directive) 2)]
+    {:type :mail
+     :id id
+     :name name
+     :address address
+     :amount amount}))
+
+;; 銀行振込による給与支払い
+(defmethod dispose :deposit [paycheck-directive]
+  (let [id (:id paycheck-directive)
+        amount (:amount paycheck-directive)
+        routing (second (:disposition paycheck-directive))
+        account (nth (:disposition paycheck-directive) 2)]
+    {:type :deposit
+     :id id
+     :routing routing
+     :account account
+     :amount amount}))
+
+;; 給与管理者経由の給与支払い
+(defmethod dispose :paymaster [paycheck-directive]
+  (let [id (:id paycheck-directive)
+        amount (:amount paycheck-directive)
+        paymaster (second (:disposition paycheck-directive))]
+    {:type :paymaster
+     :id id
+     :paymaster paymaster
+     :amount amount}))
+;; 固定給の社員の給与計算
+(defmethod calc-pay :salaried [employee]
+  (let [salary (second (:pay-class employee))]
+    salary))
+
+;; 時給制の社員の給与計算
+(defmethod calc-pay :hourly [employee]
+  (let [hourly-rate (second (:pay-class employee))
+        db (:db employee)
+        id (:id employee)
+        time-cards (get-in db [:time-cards id])
+        hours (if time-cards
+                (second (first time-cards))
+                0)]
+    (* hours hourly-rate)))
+
+;; 歩合制の社員の給与計算
+(defmethod calc-pay :commissioned [employee]
+  (let [base-salary (second (:pay-class employee))
+        commission-rate (nth (:pay-class employee) 2)
+        db (:db employee)
+        id (:id employee)
+        sales-receipts (get-in db [:sales-receipts id])
+        sales-amount (if sales-receipts
+                       (second (first sales-receipts))
+                       0)]
+    (+ base-salary (* sales-amount commission-rate))))
+
 (defn payroll [tody db]
   (let [employees (get-employees db)
         employees-to-pay (get-employees-to-be-paid-today
