@@ -109,11 +109,3 @@
         total-sales (reduce + sales)]
     (+ (* total-sales commission-rate) base-pay)))
 
-(defn payroll [tody db]
-  (let [employees (get-employees db)
-        employees-to-pay (get-employees-to-be-paid-today
-                           tody employees)
-        amounts (get-paycheck-amounts employees-to-pay)
-        ids (get-ids employees-to-pay)
-        dispositions (get-dispositions employees-to-pay)]
-    (send-paychecks ids amounts dispositions)))

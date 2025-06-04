@@ -1,6 +1,7 @@
 (ns payroll.core-test
  (:require [clojure.test :refer :all]
-           [payroll.core :refer :all])
+           [payroll.core :refer :all]
+           [payroll.payroll :refer [payroll]])
  (:import (java.time LocalDate)))
 
 (deftest parse-date-test
