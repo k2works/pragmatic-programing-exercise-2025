@@ -1,6 +1,6 @@
 (ns payroll.payroll
   (:require [payroll.interface :refer :all]
-            [payroll.core :refer [get-employees
+            [payroll.implementation :refer [get-employees
                                   get-employees-to-be-paid-today
                                   get-paycheck-amounts
                                   get-ids

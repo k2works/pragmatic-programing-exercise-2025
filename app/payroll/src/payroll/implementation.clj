@@ -1,4 +1,4 @@
-(ns payroll.core
+(ns payroll.implementation
   (:require [payroll.interface :refer :all])
   (:import (java.time LocalDate)
            (java.time.format DateTimeFormatter)
@@ -108,4 +108,3 @@
         sales (map second my-sales-receipts)
         total-sales (reduce + sales)]
     (+ (* total-sales commission-rate) base-pay)))
-
