@@ -4,6 +4,7 @@
             [payroll.disposition :refer [get-ids get-dispositions send-paychecks]]))
 
 (defn payroll [tody db]
+  "指定された日付に基づいて給与計算を実行し、給与を支払う"
   (let [employees (get-employees db)
         employees-to-pay (get-employees-to-be-paid-today
                            tody employees)
