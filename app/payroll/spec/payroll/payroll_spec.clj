@@ -1,6 +1,6 @@
 (ns payroll.payroll-spec
     (:require [speclj.core :refer :all]
-              [payroll.schedule :refer [parse-date]]
+              [payroll.utils :refer [parse-date]]
               [payroll.payroll :refer [payroll]])
     (:import (java.time LocalDate)))
 
