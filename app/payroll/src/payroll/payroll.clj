@@ -1,6 +1,5 @@
 (ns payroll.payroll
-  (:require [payroll.interface :refer :all]
-            [payroll.schedule :refer [get-employees-to-be-paid-today]]
+  (:require [payroll.schedule :refer [get-employees-to-be-paid-today]]
             [payroll.classification :refer [get-employees get-paycheck-amounts]]
             [payroll.disposition :refer [get-ids get-dispositions send-paychecks]]))
 
