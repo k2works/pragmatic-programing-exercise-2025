@@ -2,18 +2,21 @@
   (:require [clojure.spec.alpha :as s]))
 
 ;; Database specs
-(s/def ::id integer?)
+(s/def ::id string?)
 (s/def ::name string?)
 (s/def ::employees (s/coll-of ::employee))
-(s/def ::time-cards (s/map-of ::id (s/coll-of (s/tuple any? number?))))
-(s/def ::sales-receipts (s/map-of ::id (s/coll-of (s/tuple any? number?))))
+(s/def ::date string?)
+(s/def ::time-cards (s/tuple ::date pos?))
+(s/def ::time-cards (s/map-of ::id (s/coll-of ::sales-receipt)))
+(s/def ::sales-receipt (s/tuple pos?))
+(s/def ::sales-receipts (s/map-of ::id (s/coll-of ::sales-receipt)))
 (s/def ::db (s/keys :req-un [::employees]
                     :opt-un [::time-cards ::sales-receipts]))
 
 ;; Employee specs
-(s/def ::salaried-pay-class (s/tuple #{:salaried} number?))
-(s/def ::hourly-pay-class (s/tuple #{:hourly} number?))
-(s/def ::commissioned-pay-class (s/tuple #{:commissioned} number? number?))
+(s/def ::salaried-pay-class (s/tuple #{:salaried} pos?))
+(s/def ::hourly-pay-class (s/tuple #{:hourly} pos?))
+(s/def ::commissioned-pay-class (s/tuple #{:commissioned} pos? pos?))
 (s/def ::pay-class (s/or :salaried ::salaried-pay-class
                          :hourly ::hourly-pay-class
                          :commissioned ::commissioned-pay-class))
@@ -27,16 +30,31 @@
                            :deposit ::deposit-disposition
                            :paymaster ::paymaster-disposition))
 
-(s/def ::employee (s/keys :req-un [::id ::name ::pay-class ::schedule ::disposition]
+(s/def ::employee (s/keys :req-un [::id ::schedule ::pay-class ::disposition]
                           :opt-un [::db]))
 
 ;; Paycheck specs
-(s/def ::amount number?)
 (s/def ::type #{:mail :deposit :paymaster})
+(s/def ::amount pos?)
+(s/def ::name string?)
 (s/def ::address string?)
+(s/def ::mail-directive (s/and #(= (:type %):mail)
+                               (s/keys :req-un [::id
+                                                ::name
+                                                ::address
+                                                ::amount []])))
 (s/def ::routing string?)
 (s/def ::account string?)
+(s/def ::deposit-directive (s/and #(= (:type %) :deposit)
+                                  (s/keys :req-un [::id
+                                                   ::routing
+                                                   ::account
+                                                   ::amount []])))
 (s/def ::paymaster string?)
+(s/def ::paymaster-directive (s/and #(= (:type %) :paymaster)
+                                  (s/keys :req-un [::id
+                                                   ::paymaster
+                                                   ::amount []])))
 
 (s/def ::mail-paycheck (s/keys :req-un [::type ::id ::name ::address ::amount]))
 (s/def ::deposit-paycheck (s/keys :req-un [::type ::id ::routing ::account ::amount]))
@@ -44,5 +62,4 @@
 (s/def ::paycheck (s/or :mail ::mail-paycheck
                         :deposit ::deposit-paycheck
                         :paymaster ::paymaster-paycheck))
-
-(s/def ::paycheck-directive (s/keys :req-un [::id ::amount ::disposition]))
+(s/def ::paycheck-directives (s/coll-of ::paycheck))

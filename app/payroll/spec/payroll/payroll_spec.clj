@@ -1,7 +1,8 @@
 (ns payroll.payroll-spec
-    (:require [speclj.core :refer :all]
-              [payroll.utils :refer [parse-date]]
-              [payroll.payroll :refer [payroll]])
+  (:require [clojure.spec.alpha :as s]
+            [speclj.core :refer :all]
+            [payroll.utils :refer [parse-date]]
+            [payroll.payroll :refer [payroll]])
     (:import (java.time LocalDate)))
 
 (describe "parse-date"
@@ -20,13 +21,16 @@
                                 :pay-class [:salaried 5000]
                                 :disposition [:mail "name" "home"]}]
                     db {:employees employees}
-                    tody (parse-date "Nov 30 2021")]
+                    today (parse-date "Nov 30 2021")]
+                (should (s/valid? :payroll.specs/db db))
+                (let [paycheck-directives (payroll today db)]
+                  (should (s/valid? :payroll.specs/paycheck-directives paycheck-directives)))
                 (should= [{:type :mail
                            :id "emp1"
                            :name "name"
                            :address "home"
                            :amount 5000}]
-                         (payroll tody db))))
+                         (payroll today db))))
           (it "pays one hourly employee on Friday by Direct Deposit"
               (let [employees [{:id "empid"
                                 :schedule :weekly
