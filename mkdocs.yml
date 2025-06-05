@@ -1,8 +1,8 @@
-site_name: Intercept Booster2 Documentation
-site_description: Documentation for the Intercept Booster2 project
-site_author: Project Team
-repo_url: https://github.com/k2works/intercept-booster-2-sample
-repo_name: intercept-booster-2-sample
+site_name: 実践プログラミングエクササイズ 2025
+site_description: 実践プログラミングエクササイズ 2025
+site_author: k2works
+repo_url: https://github.com/k2works/pragmatic-programing-exercise-2025
+repo_name: pragmatic-programing-exercise-2025
 
 theme:
   name: material
@@ -54,4 +54,5 @@ plugins:
   - search
 
 nav:
-  - Home: Home.md
+  - Journal:
+    - 2025-05-31: journal/20250531.md
