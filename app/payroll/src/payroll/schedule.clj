@@ -1,9 +1,15 @@
 (ns payroll.schedule
-  (:require [payroll.interface :refer :all]))
+  (:require [payroll.interface :refer :all]
+            [clojure.spec.alpha :as s]
+            [payroll.specs :as specs]))
 
 (defn get-employees-to-be-paid-today [today employees]
   "日付に基づいて各従業員のスケジュールを確認し、今日給料日の従業員を取得する"
   (filter #(is-tody-payday % today) employees))
+
+(s/fdef get-employees-to-be-paid-today
+  :args (s/cat :today any? :employees (s/coll-of ::specs/employee))
+  :ret (s/coll-of ::specs/employee))
 
 (defmethod is-tody-payday :monthly [_ today]
   "月次給与の場合、月の最終日が給料日"
