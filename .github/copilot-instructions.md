@@ -10,6 +10,10 @@
 - GitHubを指定した場合は、MCP Serverの `githubAPI` を使用して、Issueの取得や管理を行います。
 - Slackを指定した場合は、MCP Serverの `slackAPI` を使用して、通知やメッセージの送信を行います。
 - Atlassianを指定した場合は、MCP Serverの `atlassianAPI` を使用して、JiraやConfluenceとの連携を行います。
+- Wiki.jsを指定した場合は、MCP Serverの `wikijs` を使用して、ドキュメントの管理を行います。
+  - Wiki.jsの日誌のタイトルは、`日誌: YYYY年MM月DD日` の形式で作成します。
+  - Wiki.jsのパスは、`日誌/YYYY年MM月DD日` の形式で指定します。
+  - plantumlを使用して、シーケンス図やクラス図を生成します。
 
 
 ## 開発日誌作成・管理フロー
@@ -84,6 +88,89 @@ git log [開始リビジョン]..[終了リビジョン] --oneline
 
 # 特定ファイルの変更詳細を確認
 git diff [開始リビジョン]..[終了リビジョン] -- [ファイルパス]
+```
+
+## Wiki.jsへの日誌登録フロー
+
+### プロセス概要図
+
+以下のシーケンス図は、日誌ファイルからWiki.jsにドキュメントを登録するまでの流れを示しています。
+
+```mermaid
+sequenceDiagram
+    participant Dev as 開発者
+    participant MD as Markdownファイル
+    participant API as Wiki.js API
+    participant Wiki as Wiki.jsサーバー
+    
+    Dev->>MD: 日誌ファイル作成
+    Note over MD: docs/journal/YYYYMMDD.md
+    Dev->>API: MCP Serverを介して日誌内容をWiki.jsに登録
+    API->>Wiki: ページ作成リクエスト
+    Wiki-->>API: 作成成功レスポンス
+    API-->>Dev: 完了通知と作成されたページID
+```
+
+### 1. Wiki.jsへの登録手順
+
+日誌をWiki.jsに登録する場合は、MCP Serverの `wikijs` 機能を使用して以下の手順で行います：
+
+1. Wiki.jsの検索機能を使って既存のページがないか確認します
+   ```
+   wikijs_search({"query": "日誌"})
+   ```
+
+2. 新しいページを作成します
+   ```
+   wikijs_create({
+     "path": "日誌/YYYY年MM月DD日",
+     "title": "日誌: YYYY年MM月DD日", 
+     "description": "作業内容の簡単な説明", 
+     "content": "Markdownフォーマットの日誌の内容"
+   })
+   ```
+
+3. 既存のページを更新する場合は以下を使用します
+   ```
+   wikijs_update({
+     "id": "ページID",
+     "title": "日誌: YYYY年MM月DD日", 
+     "content": "更新されたMarkdownフォーマットの内容"
+   })
+   ```
+
+### 2. Wiki.jsページの内容フォーマット
+
+Wiki.jsページの内容は、標準的なマークダウン形式で以下のように構成します：
+
+```markdown
+# 日誌
+
+## 日付: YYYY年MM月DD日
+
+### [作業タイトル]
+
+[作業内容の詳細な説明]
+
+#### 発生した問題
+
+1. **[問題カテゴリ]**:
+   - [問題の詳細]
+   - [エラーメッセージや具体的な状況]
+
+2. **[問題カテゴリ]**:
+   - [問題の詳細]
+
+#### 解決策
+
+1. **[解決策カテゴリ]**:
+   ```コード例やコンフィグ例```
+
+## 今後の改善点
+- [改善点の詳細]
+
+## レビュー状況
+- [レビューの現在の状況]
 ```
 
 ## GitHub Issue管理フロー
@@ -170,4 +257,3 @@ docs/
   journal/         # 開発日誌保存ディレクトリ
     YYYYMMDD.md    # 日付形式の日誌ファイル
 ```
-
