@@ -2,13 +2,121 @@
 
 レンタルビデオシステムの最小限のClojure実装です。
 
-## 概要
+## 基本仕様
++ ビデオレンタルの料金を計算して計算書を印刷するプログラム
++ システムにはどの映画を何日間借りるかが入力される。
++ 貸出の日数によって料金が計算され、映画の分類が判定される。
++ 映画の分類は３つある。一般向け、子供向け、新作。
++ レンタルポイントも印刷される。新作かどうかによってポイント計算の仕方が異なる。
 
-このプロジェクトは、以下の機能を持つシンプルなレンタルビデオシステムの実装を提供します：
-- 異なる価格カテゴリの映画の作成と管理
-- 顧客の作成と管理
-- 顧客への映画のレンタル
-- 映画の価格カテゴリとレンタル期間に基づくレンタル料金の計算
+## ユースケース
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+actor customer
+rectangle VedioRental {
+  customer -- (レンタルする)
+              (レンタル料金を計算する)
+              (計算書を印刷する)
+}
+@enduml
+```
+
+### ユースケース１：レンタルする
+
+### ユースケース２：レンタル料金を計算する
+
+### ユースケース３：計算書を印刷する
+```plantuml
+@startuml
+actor Customer
+
+Customer -> a_customer: statement
+    activate a_customer
+      a_customer -> a_customer: total charge
+      activate a_customer
+        a_customer -> a_rental:*[for all rentals] charge
+        activate a_rental
+           a_rental -> a_movie: charge(days_rented)
+           activate a_movie
+             a_movie -> a_price: charge(days_rented)
+           deactivate a_movie
+        deactivate a_rental
+      deactivate a_customer
+      a_customer -> a_customer: total_frequent_renter_points
+      activate a_customer
+        a_customer -> a_rental:*[for all rentals] frequent_renter_points
+        activate a_rental
+           a_rental -> a_movie: frequent_renter_points(days_rented)
+           activate a_movie
+             a_movie -> a_price: frequent_renter_points(days_rented)
+           deactivate a_movie
+        deactivate a_rental
+      deactivate a_customer
+    deactivate a_customer
+
+@enduml
+
+```
+
+## コアモデル
+```plantuml
+@startuml
+
+Movie "1"<-u- Rental
+Rental "*"<-l- "1"Customer
+Movie "*"-r->"1"Price
+Price <|-d- ChildrenPrice
+Price <|-d- RegularPrice
+Price <|-d- NewReleasePrice
+DefaultPrice <|-u- RegularPrice
+DefaultPrice <|-u- ChildrenPrice
+
+class Movie {
+- title
+charge(days_rented)
+frequent_renter_points(days_rented)
+}
+
+class Rental {
+- days_rented
+charge(days_rented)
+frequent_renter_points(days_rented)
+}
+
+class Customer {
+- name
+statement()
+html_statement()
+total_charge()
+total_frequent_renter_points()
+}
+
+interface Price<<protocol>> {
+charge(days_rented)
+}
+
+class NewReleasePrice {
+charge(days_rented)
+frequent_renter_points(days_rented)
+}
+
+class RegularPrice {
+charge(days_rented)
+}
+
+class ChildrenPrice {
+charge(days_rented)
+}
+
+class DefaultPrice<<module>> {
+frequent_renter_points(days_rented)
+}
+
+
+@enduml
+```
 
 ## プロジェクト構造
 
@@ -50,26 +158,6 @@ clojure.testを使用してテストを実行するには：
 
 ```bash
 clj -M:test
-```
-
-## 例
-
-```clojure
-(require '[rentalvideo.rentalvideo :refer :all])
-
-;; 映画を作成
-(def matrix (create-movie "マトリックス" "SF" :regular))
-(def toy-story (create-movie "トイ・ストーリー" "アニメーション" :children))
-(def new-movie (create-movie "新作映画" "アクション" :new-release))
-
-;; 顧客を作成
-(def customer (create-customer "山田太郎" "taro@example.com"))
-
-;; 映画をレンタル
-(def updated-customer (rent-movie customer matrix 3))
-
-;; レンタル料金を計算
-(calculate-rental-fee matrix 3)  ;; => 9.0
 ```
 
 ## ライセンス
