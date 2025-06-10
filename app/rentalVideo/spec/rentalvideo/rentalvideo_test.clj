@@ -3,15 +3,32 @@
             [rentalvideo.rentalvideo :refer [make-customer make-movie make-rental make-rental-order make-statement]]))
 
 (deftest video-store-test
-  (let [customer (atom (make-customer "Fred"))]
-    (testing "makes statement for a single new release"
+  (testing "makes statement for a single new release"
+    (let [customer (make-customer "Fred")] ; atomを削除
       (is (= (str "Rental Record for Fred\n"
                   "\tThe \t9.0\n"
                   "You owed 9.0\n"
                   "You earned 2 frequent renter points\n")
              (make-statement
                (make-rental-order
-                 @customer
+                 customer  ; @を削除
                  [(make-rental
                     (make-movie "The Cell" :new-release)
+                    3)]))))))
+
+  (testing "makes statement for two new releases"
+    (let [customer (make-customer "Fred")] ; 独立したcustomerインスタンス
+      (is (= (str "Rental Record for Fred\n"
+                  "\tThe Cell \t9.0\n"
+                  "\tThe Tigger Movie \t9.0\n"
+                  "You owed 18.0\n"
+                  "You earned 4 frequent renter points\n")
+             (make-statement
+               (make-rental-order
+                 customer
+                 [(make-rental
+                    (make-movie "The Cell" :new-release)
+                    3)
+                  (make-rental
+                    (make-movie "The Tigger Movie" :new-release)
                     3)])))))))

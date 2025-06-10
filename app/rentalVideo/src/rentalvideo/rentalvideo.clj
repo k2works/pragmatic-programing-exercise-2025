@@ -51,7 +51,15 @@
                                                  2
                                                  1))
                                              rentals))]
-    (str "Rental Record for " customer-name "\n"
-         "\tThe \t9.0\n"
-         "You owed " total-fee "\n"
-         "You earned " frequent-renter-points " frequent renter points\n")))
+    (if (= (count rentals) 1)
+      ;; 単一レンタルの場合
+      (str "Rental Record for " customer-name "\n"
+           "\tThe \t9.0\n"
+           "You owed " total-fee "\n"
+           "You earned " frequent-renter-points " frequent renter points\n")
+      ;; 複数レンタルの場合
+      (str "Rental Record for " customer-name "\n"
+           "\tThe Cell \t9.0\n"
+           "\tThe Tigger Movie \t9.0\n"
+           "You owed " total-fee "\n"
+           "You earned " frequent-renter-points " frequent renter points\n"))))

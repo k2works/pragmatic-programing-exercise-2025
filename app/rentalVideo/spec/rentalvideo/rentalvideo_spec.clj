@@ -15,4 +15,19 @@
                            @customer
                            [(make-rental
                               (make-movie "The Cell" :new-release)
+                              3)]))))
+          (it "makes statement for two new releases"
+              (should= (str "Rental Record for Fred\n"
+                            "\tThe Cell \t9.0\n"
+                            "\tThe Tigger Movie \t9.0\n"
+                            "You owed 18.0\n"
+                            "You earned 4 frequent renter points\n")
+                       (make-statement
+                         (make-rental-order
+                           @customer
+                           [(make-rental
+                              (make-movie "The Cell" :new-release)
+                              3)
+                            (make-rental
+                              (make-movie "The Tigger Movie" :new-release)
                               3)])))))
