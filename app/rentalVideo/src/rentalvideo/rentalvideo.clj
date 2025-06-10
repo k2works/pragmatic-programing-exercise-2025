@@ -5,24 +5,15 @@
 (defn make-customer [name]
   {:name name})
 
-(defn create-customer [name]
-  (make-customer name))
-
 ;; Movie functions
 (defn make-movie [title category]
   {:title title
    :category category})
 
-(defn create-movie [title category]
-  (make-movie title category))
-
 ;; Rental functions
 (defn make-rental [movie days]
   {:movie movie
    :days days})
-
-(defn rent-movie [customer movie days]
-  (make-rental movie days))
 
 ;; Rental order functions
 (defn make-rental-order [customer rentals]
