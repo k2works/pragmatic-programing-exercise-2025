@@ -43,7 +43,7 @@
                (make-rental-order
                  customer
                  [(make-rental
-                    (make-movie "The Tigger Movie" :children)
+                    (make-movie "The Tigger Movie" :childrens)
                     3)]))))))
 
   (testing "makes statement for several regular movies"

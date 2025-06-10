@@ -40,7 +40,7 @@
                          (make-rental-order
                            @customer
                            [(make-rental
-                              (make-movie "The Tigger Movie" :children)
+                              (make-movie "The Tigger Movie" :childrens)
                               3)]))))
           (it "makes statement for several regular movies"
               (should= (str "Rental Record for Fred\n"
