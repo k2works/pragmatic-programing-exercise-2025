@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [rentalvideo.rentalvideo :refer :all]))
 
-(deftest video-store-test
+(deftest rental-store-calculation-test
   (testing "makes statement for a single new release"
     (let [customer (make-customer "Fred")]
       (is (= {:customer-name "Fred"
@@ -59,6 +59,41 @@
                    customer
                    [(make-rental
                       (make-movie "Plan 9 from Outer Space" :regular)
+                      1)
+                    (make-rental
+                      (make-movie "8 1/2" :regular)
+                      2)
+                    (make-rental
+                      (make-movie "Eraserhead" :regular)
+                      3)])))))))
+
+(deftest rental-statement-format-test
+  (testing "Formats a rental statement"
+    (is (= (str "Rental Record for CUSTOMER\n"
+                  "\tMOVIE\t9.9\n"
+                  "You owed 100.0\n"
+                  "You earned 99 frequent renter points\n")
+             (format-rental-statement
+               {:customer-name "CUSTOMER"
+                :movies [{:title "MOVIE" :price 9.9}]
+                :owed 100.0
+                :points 99})))))
+
+(deftest integration-test
+  (testing "formats a statement for several regular movies"
+    (is (= (str "Rental Record for Fred\n"
+                  "\tPlan 9 from Outer Space\t2.0\n"
+                  "\t8 1/2\t2.0\n"
+                  "\tEraserhead\t3.5\n"
+                  "You owed 7.5\n"
+                  "You earned 3 frequent renter points\n")
+             (format-rental-statement
+               (make-statement-data
+                 (make-rental-order
+                   (make-customer "Fred")
+                   [(make-rental
+                      (make-movie
+                        "Plan 9 from Outer Space" :regular)
                       1)
                     (make-rental
                       (make-movie "8 1/2" :regular)
