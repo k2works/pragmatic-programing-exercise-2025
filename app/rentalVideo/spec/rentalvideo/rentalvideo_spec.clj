@@ -1,28 +1,31 @@
 (ns rentalvideo.rentalvideo-spec
   (:require [speclj.core :refer :all]
-            [rentalvideo.rentalvideo :refer [make-customer make-movie make-rental make-rental-order make-statement]]))
+            [rentalvideo.rentalvideo :refer :all]))
 
-(describe "Video Store"
+(declare customer)
+
+(describe "Rental Statement Calculation"
           (with customer (make-customer "Fred"))
 
           (it "makes statement for a single new release"
-              (should= (str "Rental Record for Fred\n"
-                            "\tThe Cell\t9.0\n"
-                            "You owed 9.0\n"
-                            "You earned 2 frequent renter points\n")
-                       (make-statement
+              (should= {:customer-name "Fred"
+                        :movies [{:title "The Cell"
+                                  :price 9.0}]
+                        :owed 9.0
+                        :points 2}
+                       (make-statement-data
                          (make-rental-order
                            @customer
                            [(make-rental
                               (make-movie "The Cell" :new-release)
                               3)]))))
           (it "makes statement for two new releases"
-              (should= (str "Rental Record for Fred\n"
-                            "\tThe Cell\t9.0\n"
-                            "\tThe Tigger Movie\t9.0\n"
-                            "You owed 18.0\n"
-                            "You earned 4 frequent renter points\n")
-                       (make-statement
+              (should= {:customer-name "Fred",
+                        :movies [{:title "The Cell", :price 9.0}
+                                 {:title "The Tigger Movie", :price 9.0}],
+                        :owed 18.0,
+                        :points 4}
+                       (make-statement-data
                          (make-rental-order
                            @customer
                            [(make-rental
@@ -32,24 +35,24 @@
                               (make-movie "The Tigger Movie" :new-release)
                               3)]))))
           (it "makes statement for one childrens movie"
-              (should= (str "Rental Record for Fred\n"
-                            "\tThe Tigger Movie\t1.5\n"
-                            "You owed 1.5\n"
-                            "You earned 1 frequent renter points\n")
-                       (make-statement
+              (should= {:customer-name "Fred",
+                        :movies [{:title "The Tigger Movie", :price 1.5}],
+                        :owed 1.5,
+                        :points 1}
+                       (make-statement-data
                          (make-rental-order
                            @customer
                            [(make-rental
                               (make-movie "The Tigger Movie" :childrens)
                               3)]))))
           (it "makes statement for several regular movies"
-              (should= (str "Rental Record for Fred\n"
-                            "\tPlan 9 from Outer Space\t2.0\n"
-                            "\t8 1/2\t2.0\n"
-                            "\tEraserhead\t3.5\n"
-                            "You owed 7.5\n"
-                            "You earned 3 frequent renter points\n")
-                       (make-statement
+              (should= {:customer-name "Fred",
+                        :movies [{:title "Plan 9 from Outer Space", :price 2.0}
+                                 {:title "8 1/2", :price 2.0}
+                                 {:title "Eraserhead", :price 3.5}],
+                        :owed 7.5,
+                        :points 3}
+                       (make-statement-data
                          (make-rental-order
                            @customer
                            [(make-rental

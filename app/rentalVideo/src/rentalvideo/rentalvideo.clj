@@ -42,6 +42,16 @@
     2
     1)))
 
+(defn make-statement-data [rental-order]
+  (let [{:keys [name]} (:customer rental-order)
+        {:keys [rentals]} rental-order]
+    {:customer-name name
+     :movies (for [rental rentals]
+             {:title (:title (:movie rental))
+              :price (determine-amount rental)})
+     :owed (reduce + (map determine-amount rentals))
+     :points (reduce + (map determine-points rentals))}))
+
 (defn make-detail [rental]
   (let [title (:title (:movie rental))
         price (determine-amount rental)]
