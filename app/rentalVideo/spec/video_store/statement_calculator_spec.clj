@@ -1,6 +1,6 @@
-(ns rentalvideo.rentalvideo-spec
+(ns video-store.statement-calculator-spec
   (:require [speclj.core :refer :all]
-            [rentalvideo.rentalvideo :refer :all]))
+            [video-store.statement-calculator :refer :all]))
 
 (declare customer)
 
@@ -68,9 +68,9 @@
 (describe "Rental Statement Format"
           (it "Formats a rental statement"
               (should= (str "Rental Record for CUSTOMER\n"
-                                    "\tMOVIE\t9.9\n"
-                                    "You owed 100.0\n"
-                                    "You earned 99 frequent renter points\n")
+                            "\tMOVIE\t9.9\n"
+                            "You owed 100.0\n"
+                            "You earned 99 frequent renter points\n")
                        (format-rental-statement
                          {:customer-name "CUSTOMER"
                           :movies [{:title "MOVIE" :price 9.9}]
@@ -96,6 +96,6 @@
                               (make-rental
                                 (make-movie "8 1/2" :regular)
                                 2)
-                             (make-rental
-                               (make-movie "Eraserhead" :regular)
+                              (make-rental
+                                (make-movie "Eraserhead" :regular)
                                 3)]))))))

@@ -1,4 +1,4 @@
-(ns rentalvideo.rentalvideo
+(ns video-store.statement-calculator
   (:require [clojure.spec.alpha :as s]
             [clojure.string :as string]))
 
