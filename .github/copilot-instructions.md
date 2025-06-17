@@ -179,6 +179,9 @@ Wiki.jsページの内容は、標準的なマークダウン形式で以下の�
 
 プロジェクトのGitHub Issueを取得・管理するためのフローです。
 
+対象ユーザー名は k2works
+対象リポジトリ名は pragmatic-programing-exercise-2025
+
 ```mermaid
 sequenceDiagram
     participant Dev as 開発者
@@ -197,7 +200,7 @@ sequenceDiagram
 
 ### 1. GitHub Issueの取得
 
-GitHub Issueを取得するには、MCP Server （GitHub API）の `search_repositories` 機能を使用します。
+GitHub Issueを取得するには、MCP Server （GitHub API）の `search_issues` 機能を使用します。
 
 ### 2. コマンドラインからのIssue取得
 
