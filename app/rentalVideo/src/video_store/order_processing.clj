@@ -1,6 +1,6 @@
 (ns video-store.order-processing
-  (:require [video_store.statement-formatter :refer :all]
-            [video_store.statement-policy :refer :all]))
+  (:require [video-store.statement-formatter :refer :all]
+            [video-store.statement-policy :refer :all]))
 
 (defn process-order [policy formatter order]
   (->> order

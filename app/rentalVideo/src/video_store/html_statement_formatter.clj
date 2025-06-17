@@ -10,14 +10,14 @@
         owed (:owed statement-data)
         points (:points statement-data)]
     (str
-      (format "<h1>Rental Record for %s</h1>\n" customer-name)
+      (format "<h1>Rental Record for %s</h1>" customer-name)
       "<table>"
       (apply str
              (for [movie movies]
-               (format "<tr><td>%s</td><td>%.1f</td></tr>\n"
+               (format "<tr><td>%s</td><td>%.1f</td></tr>"
                        (:title movie)
                        (:price movie))))
       "</table>"
-      (format "<p>You owed %.1f</p>\n" owed)
-      (format "<p>You earned <b>%d</b> frequent renter points</p>\n"
+      (format "You owed %.1f<br>" owed)
+      (format "You earned <b>%d</b> frequent renter points"
               points))))

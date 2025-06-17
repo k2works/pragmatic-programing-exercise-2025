@@ -8,12 +8,18 @@
 (defmulti total-amount (fn [policy _rentals] (:type policy)))
 (defmulti total-points (fn [policy _rentals] (:type policy)))
 
-(defn make-statement-data [policy rental-order]
-  (let [{:keys [name]} (:customer rental-order)
-        {:keys [rentals]} rental-order]
-    {:customer-name name
-     :movies (for [rental rentals]
-               {:title (:title (:move rental))
-                :price (determine-amount policy rental)})
-     :owed (total-amount policy rentals)
-     :points (total-points policy rentals)}))
+(defmethod total-amount nil [_policy _rentals] 0)
+(defmethod total-points nil [_policy _rentals] 0)
+
+(defn make-statement-data
+  ([policy] (make-statement-data policy {}))
+  ([policy rental-order]
+   (let [{:keys [name]} (:customer rental-order)
+         {:keys [rentals]} rental-order
+         rentals (or rentals [])]
+     {:customer-name name
+      :movies (vec (for [rental rentals]
+                {:title (:title (:movie rental))
+                 :price (determine-amount policy rental)}))
+      :owed (total-amount policy rentals)
+      :points (total-points policy rentals)})))

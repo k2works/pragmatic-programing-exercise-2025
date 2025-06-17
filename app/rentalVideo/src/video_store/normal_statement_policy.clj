@@ -1,7 +1,7 @@
 (ns video-store.normal-statement-policy
   (:require [video-store.statement-policy :refer :all]))
 
-(defn make-normal-policy [] {:type :normal})
+(defn make-normal-policy [] {:type ::normal})
 
 (defmethod determine-amount [::normal :regular] [_policy rental]
   (let [days (:days rental)]
@@ -22,13 +22,31 @@
   [_policy rental]
   (* 3.0 (:days rental)))
 
-(defmethod determine-amount [::normal :regular] [_policy rental]
-  1)
 
 (defmethod determine-points
   [::normal :regular]
+  [_policy _rental]
+  1)
+
+(defmethod determine-points
+  [::normal :childrens]
+  [_policy _rental]
+  1)
+
+(defmethod determine-points
+  [::normal :new-release]
   [_policy rental]
-  (if (> (:days rental) 1)2 1))
+  (if (> (:days rental) 1) 2 1))
+
+(defmethod determine-amount
+  [::normal nil]
+  [_policy _rental]
+  0)
+
+(defmethod determine-points
+  [::normal nil]
+  [_policy _rental]
+  0)
 
 (defmethod total-amount ::normal [policy rentals]
   (reduce + (map #(determine-amount policy %) rentals)))
