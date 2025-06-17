@@ -10,11 +10,11 @@
 (describe "Integration Test"
           (with rental-order (make-rental-order
                                (make-customer "Fred")
-                               [[make-rental
+                               [(make-rental
                                  (make-movie
                                    "Plan 9 from Outer Space"
-                                   :regula)
-                                 1]
+                                   :regular)
+                                 1)
                                 (make-rental
                                   (make-movie "8 1/2", :regular)
                                   2)

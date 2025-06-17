@@ -17,4 +17,4 @@
                        (:title movie)
                        (:price movie))))
       (format "You owed %.1f\n" owed)
-      (format "You earned %d frequent renter points\n" points))))
+      (format "You earned %d frequent renter points\n" (int points)))))
