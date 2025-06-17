@@ -8,7 +8,7 @@
 (declare rental-order)
 
 (describe "Integration Test"
-          (wiht rental-order (make-rental-order
+          (with rental-order (make-rental-order
                                (make-customer "Fred")
                                [[make-rental
                                  (make-movie

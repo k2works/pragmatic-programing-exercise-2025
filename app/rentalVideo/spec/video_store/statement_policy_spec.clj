@@ -13,7 +13,7 @@
           (with customer (make-customer "CUSTOMER"))
           (with normal-policy (make-normal-policy))
           (with new-release-1 (make-movie "new release 1" :new-release))
-          (wiht new-release-2 (make-movie "new release 2" :new-release))
+          (with new-release-2 (make-movie "new release 2" :new-release))
           (with childrens (make-movie "childrens" :childrens))
           (with regular-1 (make-movie "regular 1" :regular))
           (with regular-2 (make-movie "regular 2" :regular))
@@ -52,7 +52,7 @@
                                      [(make-rental @childrens 3)]))))
                    (it "make statement for several regular movies"
                        (should= {:customer-name "CUSTOMER",
-                                 :movies [{:title "regular 1", :prive 2.0}
+                                 :movies [{:title "regular 1", :price 2.0}
                                           {:title "regular 2", :price 2.0}
                                           {:title "regular 3", :price 3.5}],
                                   :owed 7.5,
@@ -65,7 +65,7 @@
                                      (make-rental @regular-2 2)
                                      (make-rental @regular-3 3)])))))
 
-          (context "Buy tow get one free policy"
+          (context "Buy two get one free policy"
                    (it "makes statement for several regular movies"
                        (should= {:customer-name "CUSTOMER",
                                  :movies [{:title "regular 1", :price 2.0}
