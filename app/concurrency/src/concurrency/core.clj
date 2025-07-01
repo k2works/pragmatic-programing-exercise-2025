@@ -19,21 +19,21 @@
                         [:waiting-for-hangup connect]}
    :waiting-for-hangup {:hangup [:idle disconnect]}})
 
-  (def log (atom []))
+(def log (atom []))
 
-  (defn transition [machine-agent event event-data]
-  (swap! log conj (str (:name machine-agent) "<-" event))
-  (let [state (:state machine-agent)
-        sm (:machine machine-agent)
-        result (get-in sm [state event])]
-    (if (nil? result)
-      (do
-        (swap! log conj "TILT!")
-        machine-agent)
-      (do
-        (when (second result)
-          ((second result) machine-agent event-data))
-        (assoc machine-agent :state (first result))))))
+(defn transition [machine-agent event event-data]
+(swap! log conj (str (:name machine-agent) "<-" event))
+(let [state (:state machine-agent)
+      sm (:machine machine-agent)
+      result (get-in sm [state event])]
+  (if (nil? result)
+    (do
+      (swap! log conj "TILT!")
+      machine-agent)
+    (do
+      (when (second result)
+        ((second result) machine-agent event-data))
+      (assoc machine-agent :state (first result))))))
 
 (defn make-user-agent [name]
   (agent {:state :idle :name name :machine user-sm}))
