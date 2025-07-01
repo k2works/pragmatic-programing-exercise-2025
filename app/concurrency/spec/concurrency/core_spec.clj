@@ -6,7 +6,7 @@
           (it "should make and receive call"
               (let [caller (make-user "Bob")
                     callee (make-user "Alice")
-                    telco (make-teloc "telco")]
+                    telco (make-telco "telco")]
                 (reset! log [])
                 (send caller transition :call [telco caller callee])
                 (Thread/sleep 100)
@@ -17,8 +17,8 @@
           (it "should race"
               (let [caller (make-user "Bob")
                     callee (make-user "Alice")
-                    telco1 (make-teloc "telco1")
-                    telco2 (make-teloc "telco2")]
+                    telco1 (make-telco "telco1")
+                    telco2 (make-telco "telco2")]
                 (reset! log [])
                 (send caller transition :call [telco1 caller callee])
                 (send caller transition :call [telco2 callee caller])

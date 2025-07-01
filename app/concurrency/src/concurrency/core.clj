@@ -44,7 +44,7 @@
 (defn make-user [name]
   (make-user-agent name))
 
-(defn make-teloc [name]
+(defn make-telco [name]
   (make-telco-agent name))
 
 (defn caller-off-hook
