@@ -27,4 +27,14 @@
                 (should= :idle (:state @caller))
                 (should= :idle (:state @callee))
                 (should= :idle (:state @telco1))
-                (should= :idle (:state @telco2)))))
+                (should= :idle (:state @telco2))))
+          (it "should handle caller-off-hook"
+              (let [caller (make-user "Bob")
+                    callee (make-user "Alice")
+                    telco (make-telco "telco")]
+                (reset! log [])
+                (caller-off-hook caller [telco caller callee])
+                (Thread/sleep 200)
+                (prn @log)
+                (should (contains? (set @log) "Bob goes off hook."))
+                (should (contains? (set @log) "telco<-caller-off-hook")))))

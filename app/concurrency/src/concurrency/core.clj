@@ -22,7 +22,7 @@
 (def log (atom []))
 
 (defn transition [machine-agent event event-data]
-(swap! log conj (str (:name machine-agent) "<-" event))
+(swap! log conj (str (:name machine-agent) "<-" (name event)))
 (let [state (:state machine-agent)
       sm (:machine machine-agent)
       result (get-in sm [state event])]

@@ -30,3 +30,17 @@
       (is (= :idle (:state @callee)))
       (is (= :idle (:state @telco1)))
       (is (= :idle (:state @telco2))))))
+
+(deftest caller-off-hook-test
+  (testing "should handle caller-off-hook"
+    (let [caller (make-user "Bob")
+          callee (make-user "Alice")
+          telco (make-telco "telco")]
+      (reset! log [])
+      (caller-off-hook caller [telco caller callee])
+      (Thread/sleep 50)
+      (prn @log)
+      (is (= :idle (:state @caller)))
+      (is (= :idle (:state @callee)))
+      (is (contains? (set @log) "Bob goes off hook."))
+      (is (contains? (set @log) "telco<-caller-off-hook")))))
