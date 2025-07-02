@@ -13,24 +13,43 @@ Abstract Serverパターンは、アルゴリズムのファミリーを定義�
 現在の実装では、スイッチ可能なオブジェクト（例：ライト）に対して、オン/オフの操作を行うストラテジーを提供しています。
 
 ```clojure
-;; マルチメソッドの定義
-(defmulti turn-on :type)
-(defmulti turn-off :type)
+;; プロトコルの定義
+(defprotocol SwitchStrategy
+  (turn-on [this switchable] "Turn on the switchable object")
+  (turn-off [this switchable] "Turn off the switchable object"))
 
-;; ライト用の実装
-(defmethod turn-on :light [switchable]
-  (turn-on-light))
+;; レコード形式の実装
+(defrecord LightStrategy []
+  SwitchStrategy
+  (turn-on [_ switchable]
+    (turn-on-light))
+  (turn-off [_ switchable]
+    (turn-off-light)))
 
-(defmethod turn-off :light [switchable]
-  (turn-off-light))
+;; 戦略を作成する関数
+(defn create-strategy [switchable]
+  (case (:type switchable)
+    :light (->LightStrategy)
+    nil))
 
 ;; スイッチを操作する関数
 (defn engage-switch [switchable]
-  (turn-on switchable)
-  (turn-off switchable))
+  (let [strategy (create-strategy switchable)]
+    (if strategy
+      (do
+        (turn-on strategy switchable)
+        (turn-off strategy switchable))
+      (do
+        ;; 後方互換性のためのマルチメソッド
+        (legacy-turn-on switchable)
+        (legacy-turn-off switchable)))))
 ```
 
-この実装では、`:type`キーに基づいてディスパッチするマルチメソッドを使用しています。これにより、新しいタイプのスイッチ可能なオブジェクトを追加する際に、既存のコードを変更することなく拡張できます。
+この実装では、プロトコルとレコード形式を使用して、より明示的なインターフェースと実装を提供しています。`SwitchStrategy`プロトコルは、スイッチ可能なオブジェクトに対する操作を定義し、`LightStrategy`レコードはそのプロトコルを実装しています。
+
+また、後方互換性のために、マルチメソッドベースの実装も維持しています。新しい実装では、`create-strategy`関数を使用して適切な戦略を作成し、それを使用してスイッチを操作します。
+
+この実装により、新しいタイプのスイッチ可能なオブジェクトを追加する際に、新しいレコード型を定義し、プロトコルを実装するだけで拡張できます。
 
 #### クラス図
 
@@ -41,13 +60,17 @@ Abstract Serverパターンは、アルゴリズムのファミリーを定義�
 skinparam classAttributeIconSize 0
 
 interface "SwitchStrategy" as strategy {
-  +turn-on(switchable)
-  +turn-off(switchable)
+  +turn-on(this, switchable)
+  +turn-off(this, switchable)
 }
 
 class "LightStrategy" as light {
-  +turn-on(switchable)
-  +turn-off(switchable)
+  +turn-on(this, switchable)
+  +turn-off(this, switchable)
+}
+
+class "StrategyFactory" as factory {
+  +create-strategy(switchable)
 }
 
 class "Client" as client {
@@ -55,25 +78,36 @@ class "Client" as client {
 }
 
 strategy <|.. light
+factory ..> light : creates
 client --> strategy
+client --> factory : uses
 
 note right of strategy
-  Clojureでは、マルチメソッドを使用して
-  インターフェースを実装します。
-  turn-onとturn-offは:typeに基づいて
-  ディスパッチされます。
+  Clojureでは、プロトコルを使用して
+  インターフェースを定義します。
+  turn-onとturn-offメソッドは
+  各実装によって提供されます。
 end note
 
 note right of light
-  :lightタイプに対する実装は
+  LightStrategyレコードは
+  SwitchStrategyプロトコルを実装し、
   turn-on-lightとturn-off-light関数を
   呼び出します。
 end note
 
+note right of factory
+  create-strategy関数は
+  switchableの:typeに基づいて
+  適切な戦略を作成します。
+end note
+
 note right of client
   engage-switch関数は
-  turn-onとturn-offマルチメソッドを
-  使用してスイッチを操作します。
+  create-strategyを使用して戦略を取得し、
+  そのプロトコルメソッドを呼び出します。
+  戦略が見つからない場合は、
+  レガシーのマルチメソッドを使用します。
 end note
 @enduml
 ```
@@ -86,37 +120,49 @@ end note
 @startuml
 actor User
 participant "Client\n(engage-switch)" as client
-participant "Multimethod\n(turn-on/turn-off)" as multimethod
-participant "LightStrategy\n(turn-on-light/turn-off-light)" as light
+participant "StrategyFactory\n(create-strategy)" as factory
+participant "LightStrategy\n(record)" as strategy
+participant "LightFunctions\n(turn-on-light/turn-off-light)" as light
 
 User -> client : engage-switch({:type :light})
 activate client
 
-client -> multimethod : turn-on({:type :light})
-activate multimethod
-multimethod -> light : turn-on-light()
-activate light
-light --> multimethod : 結果
-deactivate light
-multimethod --> client : 結果
-deactivate multimethod
+client -> factory : create-strategy({:type :light})
+activate factory
+factory --> client : LightStrategy
+deactivate factory
 
 note right
-  マルチメソッドは:typeキーに基づいて
-  適切な実装にディスパッチします
+  create-strategy関数は:typeキーに基づいて
+  適切な戦略を作成します
 end note
 
-client -> multimethod : turn-off({:type :light})
-activate multimethod
-multimethod -> light : turn-off-light()
+client -> strategy : turn-on(strategy, {:type :light})
+activate strategy
+strategy -> light : turn-on-light()
 activate light
-light --> multimethod : 結果
+light --> strategy : 結果
 deactivate light
-multimethod --> client : 結果
-deactivate multimethod
+strategy --> client : 結果
+deactivate strategy
+
+client -> strategy : turn-off(strategy, {:type :light})
+activate strategy
+strategy -> light : turn-off-light()
+activate light
+light --> strategy : 結果
+deactivate light
+strategy --> client : 結果
+deactivate strategy
 
 client --> User : 結果
 deactivate client
+
+note right
+  プロトコルベースの実装では、
+  戦略オブジェクトのメソッドを
+  直接呼び出します
+end note
 @enduml
 ```
 
