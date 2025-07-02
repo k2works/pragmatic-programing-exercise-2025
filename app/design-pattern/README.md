@@ -138,7 +138,7 @@ cd design-pattern
 例えば、Abstract Serverパターンを使用するには：
 
 ```clojure
-(require '[design-pattern.core :refer :all])
+(require '[design-pattern.abstract-server :refer :all])
 
 ;; ライトを操作する
 (engage-switch {:type :light})

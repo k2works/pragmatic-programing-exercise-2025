@@ -1,6 +1,6 @@
-(ns design-pattern.core-spec
+(ns design-pattern.abstract-server-spec
   (:require [speclj.core :refer :all]
-            [design-pattern.core :refer :all]))
+            [design-pattern.abstract-server :refer :all]))
 
 (describe "switch/light"
           (with-stubs)

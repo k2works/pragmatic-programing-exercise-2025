@@ -1,6 +1,6 @@
-(ns design-pattern.core-test
+(ns design-pattern.abstract-server-test
   (:require [clojure.test :refer :all]
-            [design-pattern.core :refer :all]))
+            [design-pattern.abstract-server :refer :all]))
 
 (deftest switch-light-test
   (testing "turns light on and off"

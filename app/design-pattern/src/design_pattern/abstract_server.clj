@@ -1,4 +1,4 @@
-(ns design-pattern.core)
+(ns design-pattern.abstract-server)
 
 (defn turn-on-light []
   ;turn on the bloody light!
