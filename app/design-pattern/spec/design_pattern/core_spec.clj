@@ -2,7 +2,11 @@
   (:require [speclj.core :refer :all]
             [design-pattern.core :refer :all]))
 
-(describe "Design Pattern Core"
-  (it "should say hello"
-    (should= "Hello from Design Patterns in Clojure!\r\n"
-             (with-out-str (hello)))))
+(describe "switch/light"
+          (with-stubs)
+          (it "turns light on and off"
+              (with-redefs [turn-on-light (stub :turn-on-light)
+                            turn-off-light (stub :turn-off-light)]
+                (engage-switch {:type :light})
+                (should-have-invoked :turn-on-light)
+                (should-have-invoked :turn-off-light))))

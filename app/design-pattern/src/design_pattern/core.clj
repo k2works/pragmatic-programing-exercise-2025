@@ -1,19 +1,25 @@
 (ns design-pattern.core)
 
-;; Core functionality for design patterns
+(defn turn-on-light []
+  ;turn on the bloody light!
+  )
 
-(defn hello
-  "A simple function to verify the project is working"
-  []
-  (println "Hello from Design Patterns in Clojure!"))
+(defn turn-off-light []
+  ;Criminy! just turn it off!
+  )
 
-;; This namespace will serve as the entry point for the design patterns project.
-;; Each design pattern will be implemented in its own namespace.
+(defmulti turn-on :type)
+(defmulti turn-off :type)
 
-;; Example of how to use this project:
-;; (require '[design-pattern.core :as core])
-;; (core/hello)
-;;
-;; For specific patterns:
-;; (require '[design-pattern.strategy :as strategy])
-;; (strategy/execute-strategy ...)
+(defmethod turn-on :light [switchable]
+  (turn-on-light))
+
+(defmethod turn-off :light [switchable]
+  (turn-off-light))
+
+(defn engage-switch [switchable]
+  ;Some other stuff...
+  (turn-on switchable)
+  ;Some more other stuff...
+  (turn-off switchable)
+  )
