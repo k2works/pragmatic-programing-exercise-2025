@@ -1,0 +1,72 @@
+# This workflow will build a Clojure project and run tests
+# For more information see: https://github.com/actions/setup-java
+
+name: Clojure CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install Clojure Tools
+      uses: DeLaGuardo/setup-clojure@12.1
+      with:
+        cli: 1.11.1.1347
+
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/deps.edn') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Cache Clojure dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.gitlibs
+        key: ${{ runner.os }}-gitlibs-${{ hashFiles('**/deps.edn') }}
+        restore-keys: ${{ runner.os }}-gitlibs
+
+    - name: Run tests for rentalVideo
+      run: |
+        echo "Running tests for rentalVideo"
+        pushd app/rentalVideo > /dev/null
+        clojure -M:spec
+        popd > /dev/null
+
+    - name: Run tests for bowlinggame
+      run: |
+        if [ -f app/bowlinggame/deps.edn ]; then
+          echo "Running tests for bowlinggame"
+          pushd app/bowlinggame > /dev/null
+          clojure -M:spec || true
+          popd > /dev/null
+        fi
+
+    - name: Run tests for other Clojure projects
+      run: |
+        for dir in app/*/; do
+          if [ "$dir" != "app/rentalVideo/" ] && [ "$dir" != "app/bowlinggame/" ]; then
+            if [ -f "${dir}deps.edn" ]; then
+              echo "Running tests for $dir"
+              pushd "$dir" > /dev/null
+              clojure -M:spec || true
+              popd > /dev/null
+            fi
+          fi
+        done

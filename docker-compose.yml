@@ -119,7 +119,8 @@ services:
       context: .
       dockerfile: ./ops/docker/mkdocs/Dockerfile
     volumes:
-      - ./docs/wiki:/docs/docs
+      - ./README.md:/docs/docs/README.md
+      - ./docs/journal:/docs/docs/journal
       - ./mkdocs.yml:/docs/mkdocs.yml
     ports:
       - "9000:8000"
