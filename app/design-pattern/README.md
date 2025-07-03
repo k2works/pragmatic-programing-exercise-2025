@@ -6,6 +6,149 @@
 
 このプロジェクトでは、以下のデザインパターンの実装を提供しています：
 
+### Adapterパターン
+
+Adapterパターンは、既存のクラスのインターフェースを、クライアントが期待する別のインターフェースに変換するパターンです。このパターンを使用すると、互換性のないインターフェースを持つクラス同士を連携させることができます。
+
+現在の実装では、可変強度を持つライト（VariableLight）を、単純なオン/オフ機能を持つSwitchableインターフェースに適応させています。
+
+```clojure
+;; Switchableインターフェース（ターゲット）
+(defmulti turn-on :type)
+(defmulti turn-off :type)
+
+;; VariableLight（アダプティー）
+(defn turn-on-light [intensity]
+  ;Turn it on with intensity.
+  )
+
+;; VariableLightAdapter（アダプター）
+(defn make-adapter [min-intensity max-intensity]
+  {:type :variable-light
+   :min-intensity min-intensity
+   :max-intensity max-intensity})
+
+(defmethod turn-on :variable-light [variable-light]
+  (turn-on-light (:max-intensity variable-light)))
+
+(defmethod turn-off :variable-light [variable-light]
+  (turn-on-light (:min-intensity variable-light)))
+
+;; クライアント
+(defn engage-switch [switchable]
+  (turn-on switchable)
+  (turn-off switchable))
+```
+
+この実装では、マルチメソッドを使用してアダプターパターンを実現しています。`variable-light-adapter`は、可変強度を持つライトを単純なオン/オフインターフェースに適応させるアダプターです。
+
+アダプターは、`turn-on`を最大強度でのライト点灯に、`turn-off`を最小強度でのライト点灯にマッピングします。これにより、可変強度ライトを通常のスイッチと同じように扱うことができます。
+
+#### クラス図
+
+以下は、Adapterパターンの実装を表すクラス図です：
+
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+interface "Switchable" as switchable {
+  +turn-on(switchable)
+  +turn-off(switchable)
+}
+
+class "VariableLight" as variableLight {
+  +turn-on-light(intensity)
+}
+
+class "VariableLightAdapter" as adapter {
+  +type: :variable-light
+  +min-intensity
+  +max-intensity
+  +turn-on(variable-light)
+  +turn-off(variable-light)
+}
+
+class "Client" as client {
+  +engage-switch(switchable)
+}
+
+adapter ..|> switchable
+adapter --> variableLight : adapts
+client --> switchable : uses
+
+note right of switchable
+  Switchableはマルチメソッドで
+  定義されたインターフェースで、
+  turn-onとturn-offメソッドを
+  提供します。
+end note
+
+note right of variableLight
+  VariableLightは強度を指定して
+  ライトを点灯させる機能を
+  提供します。
+end note
+
+note right of adapter
+  VariableLightAdapterは
+  Switchableインターフェースを実装し、
+  turn-onとturn-offの呼び出しを
+  適切な強度でのturn-on-light呼び出しに
+  変換します。
+end note
+
+note right of client
+  Clientはengage-switch関数を通じて
+  Switchableインターフェースを使用し、
+  実際の実装の詳細を知る必要はありません。
+end note
+@enduml
+```
+
+#### シーケンス図
+
+以下は、Adapterパターンの実行フローを表すシーケンス図です：
+
+```plantuml
+@startuml
+actor User
+participant "Client\n(engage-switch)" as client
+participant "VariableLightAdapter" as adapter
+participant "VariableLight\n(turn-on-light)" as variableLight
+
+User -> client : engage-switch(adapter)
+activate client
+
+client -> adapter : turn-on(adapter)
+activate adapter
+adapter -> variableLight : turn-on-light(max-intensity)
+activate variableLight
+variableLight --> adapter : 結果
+deactivate variableLight
+adapter --> client : 結果
+deactivate adapter
+
+client -> adapter : turn-off(adapter)
+activate adapter
+adapter -> variableLight : turn-on-light(min-intensity)
+activate variableLight
+variableLight --> adapter : 結果
+deactivate variableLight
+adapter --> client : 結果
+deactivate adapter
+
+client --> User : 結果
+deactivate client
+
+note right
+  アダプターは、Switchableインターフェースの
+  メソッド呼び出しをVariableLightの
+  適切なメソッド呼び出しに変換します
+end note
+@enduml
+```
+
 ### Abstract Serverパターン
 
 Abstract Serverパターンは、アルゴリズムのファミリーを定義し、それぞれをカプセル化して交換可能にするパターンです。Clojureでは、マルチメソッドを使用してこのパターンを実装しています。
