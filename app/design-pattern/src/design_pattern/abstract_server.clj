@@ -22,15 +22,6 @@
   (turn-off [_ switchable]
     (turn-off-light)))
 
-;; For backward compatibility with existing code
-(defmulti legacy-turn-on :type)
-(defmulti legacy-turn-off :type)
-
-(defmethod legacy-turn-on :light [switchable]
-  (turn-on (->LightStrategy) switchable))
-
-(defmethod legacy-turn-off :light [switchable]
-  (turn-off (->LightStrategy) switchable))
 
 ;; Function to create a strategy based on switchable type
 (defn create-strategy [switchable]
@@ -48,7 +39,9 @@
         ;Some more other stuff...
         (turn-off strategy switchable))
       (do
-        (legacy-turn-on switchable)
-        ;Some more other stuff...
-        (legacy-turn-off switchable))))
+        ;; Use default LightStrategy when no specific strategy is found
+        (let [default-strategy (->LightStrategy)]
+          (turn-on default-strategy switchable)
+          ;Some more other stuff...
+          (turn-off default-strategy switchable)))))
   )
