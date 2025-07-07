@@ -149,6 +149,202 @@ end note
 @enduml
 ```
 
+### Compositeパターン
+
+Compositeパターンは、オブジェクトをツリー構造で構成し、個々のオブジェクトとオブジェクトの集合を同じように扱うことができるようにするパターンです。このパターンを使用すると、クライアントは個々のオブジェクトとその組み合わせを区別せずに操作できます。
+
+現在の実装では、異なる形状（円や四角形）とそれらの組み合わせ（複合形状）を同じインターフェースで操作できるようにしています。
+
+```clojure
+;; 形状インターフェース
+(defmulti translate (fn [shape dx dy] (::type shape)))
+(defmulti scale (fn [shape factor] (::type shape)))
+
+;; 円の実装
+(defn make-circle [center radius]
+  {::shape/type ::circle
+   ::center center
+   ::radius radius})
+
+(defmethod shape/translate ::circle [circle dx dy]
+  (let [[x y] (::center circle)]
+    (assoc circle ::center [(+ x dx) (+ y dy)])))
+
+(defmethod shape/scale ::circle [circle factor]
+  (let [radius (::radius circle)]
+    (assoc circle ::radius (* radius factor))))
+
+;; 四角形の実装
+(defn make-square [top-left side]
+  {::shape/type ::square
+   ::top-left top-left
+   ::side side})
+
+(defmethod shape/translate ::square [square dx dy]
+  (let [[x y] (::top-left square)]
+    (assoc square ::top-left [(+ x dx) (+ y dy)])))
+
+(defmethod shape/scale ::square [square factor]
+  (let [side (::side square)]
+    (assoc square ::side (* side factor))))
+
+;; 複合形状の実装
+(defn make []
+  {::shape/type ::composite-shape
+   ::shapes []})
+
+(defn add [cs shape]
+  (update cs ::shapes conj shape))
+
+(defmethod shape/translate ::composite-shape [cs dx dy]
+  (let [translated-shapes (map #(shape/translate % dx dy)
+                             (::shapes cs))]
+      (assoc cs ::shapes translated-shapes)))
+
+(defmethod shape/scale ::composite-shape [cs factor]
+  (let [scaled-shapes (map #(shape/scale % factor)
+                         (::shapes cs))]
+    (assoc cs ::shapes scaled-shapes)))
+```
+
+この実装では、マルチメソッドを使用してCompositeパターンを実現しています。`translate`と`scale`という共通のインターフェースを定義し、各形状（円、四角形）とその複合形状に対して実装しています。
+
+複合形状は他の形状を含むことができ、操作（移動やサイズ変更）が複合形状に適用されると、その操作は含まれるすべての形状に再帰的に適用されます。これにより、クライアントは個々の形状と複合形状を区別せずに同じ方法で操作できます。
+
+#### クラス図
+
+以下は、Compositeパターンの実装を表すクラス図です：
+
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+interface "Shape" as shape {
+  +translate(shape, dx, dy)
+  +scale(shape, factor)
+}
+
+class "Circle" as circle {
+  +center
+  +radius
+  +translate(circle, dx, dy)
+  +scale(circle, factor)
+}
+
+class "Square" as square {
+  +top-left
+  +side
+  +translate(square, dx, dy)
+  +scale(square, factor)
+}
+
+class "CompositeShape" as composite {
+  +shapes: Collection<Shape>
+  +add(shape)
+  +translate(composite, dx, dy)
+  +scale(composite, factor)
+}
+
+circle ..|> shape
+square ..|> shape
+composite ..|> shape
+composite o--> shape : contains
+
+note right of shape
+  Shapeはマルチメソッドで
+  定義されたインターフェースで、
+  translateとscaleメソッドを
+  提供します。
+end note
+
+note right of circle
+  Circleは中心点と半径を持ち、
+  Shapeインターフェースを実装します。
+end note
+
+note right of square
+  Squareは左上の座標と辺の長さを持ち、
+  Shapeインターフェースを実装します。
+end note
+
+note right of composite
+  CompositeShapeは複数のShapeを含み、
+  操作を含まれるすべてのShapeに
+  委譲します。
+end note
+@enduml
+```
+
+#### シーケンス図
+
+以下は、Compositeパターンの実行フローを表すシーケンス図です：
+
+```plantuml
+@startuml
+actor Client
+participant "CompositeShape" as composite
+participant "Circle" as circle
+participant "Square" as square
+
+Client -> composite : make()
+activate composite
+composite --> Client : empty composite
+deactivate composite
+
+Client -> circle : make-circle([5, 5], 10)
+activate circle
+circle --> Client : circle
+deactivate circle
+
+Client -> square : make-square([0, 0], 5)
+activate square
+square --> Client : square
+deactivate square
+
+Client -> composite : add(composite, circle)
+activate composite
+composite --> Client : updated composite
+deactivate composite
+
+Client -> composite : add(composite, square)
+activate composite
+composite --> Client : updated composite
+deactivate composite
+
+Client -> composite : translate(composite, 3, 4)
+activate composite
+composite -> circle : translate(circle, 3, 4)
+activate circle
+circle --> composite : translated circle
+deactivate circle
+composite -> square : translate(square, 3, 4)
+activate square
+square --> composite : translated square
+deactivate square
+composite --> Client : translated composite
+deactivate composite
+
+Client -> composite : scale(composite, 2)
+activate composite
+composite -> circle : scale(circle, 2)
+activate circle
+circle --> composite : scaled circle
+deactivate circle
+composite -> square : scale(square, 2)
+activate square
+square --> composite : scaled square
+deactivate square
+composite --> Client : scaled composite
+deactivate composite
+
+note right
+  複合形状に対する操作は、
+  含まれるすべての形状に
+  委譲されます
+end note
+@enduml
+```
+
 ### Abstract Serverパターン
 
 Abstract Serverパターンは、アルゴリズムのファミリーを定義し、それぞれをカプセル化して交換可能にするパターンです。Clojureでは、マルチメソッドを使用してこのパターンを実装しています。
