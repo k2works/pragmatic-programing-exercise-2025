@@ -1,9 +1,9 @@
-(ns design-pattern.composite.core-spec
+(ns design-pattern.composite.light.core-spec
   (:require [speclj.core :refer :all]
-            [design-pattern.composite [light :as l]
-             [variable-light :as v]
-             [switchable :as s]
-             [composite-switchable :as cs]]))
+            [design-pattern.composite.light.light :as l]
+            [design-pattern.composite.light.variable-light :as v]
+            [design-pattern.composite.light.switchable :as s]
+            [design-pattern.composite.light.composite-switchable :as cs]))
 
 (describe "composite-switchable"
           (with-stubs)

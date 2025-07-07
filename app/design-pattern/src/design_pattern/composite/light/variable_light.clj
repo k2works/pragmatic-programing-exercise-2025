@@ -1,5 +1,5 @@
-(ns design-pattern.composite.variable-light
-  (:require [design-pattern.composite.switchable :as s]))
+(ns design-pattern.composite.light.variable-light
+  (:require [design-pattern.composite.light.switchable :as s]))
 
 (defn make-variable-light [] {:type :variable-light})
 

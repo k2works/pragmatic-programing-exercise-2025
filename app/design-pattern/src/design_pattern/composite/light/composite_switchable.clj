@@ -1,5 +1,5 @@
-(ns design-pattern.composite.composite-switchable
-  (:require [design-pattern.composite.switchable :as s]))
+(ns design-pattern.composite.light.composite-switchable
+  (:require [design-pattern.composite.light.switchable :as s]))
 
 (defn make-composite-switchable []
   {:type :composite-switchable
