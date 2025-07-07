@@ -30,5 +30,5 @@
          (number? factor)]
    :post [(s/valid? ::composite-shape %)]}
   (let [scaled-shapes (map #(shape/scale % factor)
-                           (::shape cs))]
+                           (::shapes cs))]
     (assoc cs ::shapes scaled-shapes)))

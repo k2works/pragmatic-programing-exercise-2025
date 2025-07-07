@@ -20,3 +20,10 @@
    :post [(s/assert ::square %)]}
   (let [[x y] (::top-left square)]
     (assoc square ::top-left [(+ x dx) (+ y dy)])))
+
+(defmethod shape/scale ::square [square factor]
+  {:pre [(s/valid? ::square square)
+         (number? factor)]
+   :post [(s/valid? ::square %)]}
+  (let [side (::side square)]
+    (assoc square ::side (* side factor))))
