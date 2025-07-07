@@ -30,3 +30,29 @@
                     scaled-circle (shape/scale c 5)]
                 (should= [1 2] (::circle/center scaled-circle))
                 (should= 10 (::circle/radius scaled-circle)))))
+
+(describe "composite shape"
+          (it "translates"
+              (let [cs (-> (cs/make)
+                           (cs/add (square/make-square [0 0] 1))
+                           (cs/add (circle/make-circle [10 10] 10)))
+                    translated-cs (shape/translate cs 3 4)]
+               (should= #{{::shape/type ::square/square
+                           ::square/top-left [3 4]
+                           ::square/side 1}
+                          {::shape/type ::circle/circle
+                           ::circle/center [13 14]
+                           ::circle/radius 10}}
+                (set (::cs/shapes translated-cs)))))
+          (it "scales"
+              (let [cs (-> (cs/make)
+                           (cs/add (square/make-square [0 0] 1))
+                           (cs/add (circle/make-circle [10 10] 10)))
+                    scaled-cs (shape/scale cs 12)]
+                (should= #{{::shape/type ::square/square
+                            ::square/top-left [0 0]
+                            ::square/side 12}
+                           {::shape/type ::circle/circle
+                            ::circle/center [10 10]
+                            ::circle/radius 120}}
+                         (set (::cs/shapes scaled-cs))))))
