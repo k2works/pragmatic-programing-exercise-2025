@@ -25,5 +25,5 @@
   {:pre [(s/valid? ::circle circle)
          (number? factor)]
    :post [(s/valid? ::circle %)]}
-  (let [radius (:radius circle)]
+  (let [radius (::radius circle)]
     (assoc circle ::radius (* radius factor))))
