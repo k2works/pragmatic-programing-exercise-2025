@@ -6,6 +6,13 @@
 
 このプロジェクトでは、以下のデザインパターンの実装を提供しています：
 
+- Adapterパターン - 互換性のないインターフェースを持つクラス同士を連携させる
+- Compositeパターン - オブジェクトをツリー構造で構成し、個々のオブジェクトとその集合を同じように扱う
+- Decoratorパターン - 既存のオブジェクトに新しい機能を動的に追加する
+- Abstract Serverパターン - アルゴリズムのファミリーを定義し、それぞれをカプセル化して交換可能にする
+
+以下、各パターンの詳細な説明と実装例を示します。
+
 ### Adapterパターン
 
 Adapterパターンは、既存のクラスのインターフェースを、クライアントが期待する別のインターフェースに変換するパターンです。このパターンを使用すると、互換性のないインターフェースを持つクラス同士を連携させることができます。
@@ -341,6 +348,137 @@ note right
   複合形状に対する操作は、
   含まれるすべての形状に
   委譲されます
+end note
+@enduml
+```
+
+### Decoratorパターン
+
+Decoratorパターンは、既存のオブジェクトに新しい機能を動的に追加するパターンです。このパターンを使用すると、サブクラス化による継承よりも柔軟な方法で機能を拡張できます。
+
+現在の実装では、形状（Shape）オブジェクトに操作の履歴を記録する機能を追加するJournaledShapeデコレータを提供しています。
+
+```clojure
+;; デコレータの実装
+(defn make [shape]
+  {::shape/type ::journal-shape
+   ::journal []
+   ::shape shape})
+
+(defmethod shape/translate ::journal-shape [js dx dy]
+  (-> js (update ::journal conj [:translate dx dy])
+      (assoc ::shape (shape/translate (::shape js) dx dy))))
+
+(defmethod shape/scale ::journal-shape [js factor]
+  (-> js (update ::journal conj [:scale factor])
+      (assoc ::shape (shape/scale (::shape js) factor))))
+
+;; デコレータの使用例
+(let [journaled-square (-> (js/make (square/make-square [0 0] 1))
+                           (shape/translate 2 3)
+                           (shape/scale 5))]
+  ;; ジャーナルには操作の履歴が記録されています
+  ;; [[:translate 2 3] [:scale 5]]
+  (::js/journal journaled-square))
+```
+
+この実装では、マルチメソッドを使用してDecoratorパターンを実現しています。`make`関数は既存の形状をラップし、新しいジャーナル機能を持つデコレータオブジェクトを作成します。
+
+デコレータは元の形状と同じインターフェース（`translate`と`scale`）を実装していますが、操作を元の形状に委譲する前に、その操作をジャーナルに記録します。これにより、クライアントは通常の形状とデコレートされた形状を区別せずに同じ方法で操作できます。
+
+#### クラス図
+
+以下は、Decoratorパターンの実装を表すクラス図です：
+
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+interface "Shape" as shape {
+  +translate(shape, dx, dy)
+  +scale(shape, factor)
+}
+
+class "ConcreteShape\n(Circle, Square, etc.)" as concrete {
+  +translate(shape, dx, dy)
+  +scale(shape, factor)
+}
+
+class "JournaledShape" as decorator {
+  +shape: Shape
+  +journal: Collection<Operation>
+  +translate(shape, dx, dy)
+  +scale(shape, factor)
+}
+
+shape <|.. concrete
+shape <|.. decorator
+decorator o--> shape : decorates
+
+note right of shape
+  Shapeはマルチメソッドで
+  定義されたインターフェースで、
+  translateとscaleメソッドを
+  提供します。
+end note
+
+note right of concrete
+  ConcreteShapeは
+  Shapeインターフェースの
+  具体的な実装です。
+end note
+
+note right of decorator
+  JournaledShapeはShapeを
+  デコレートし、操作を委譲する前に
+  ジャーナルに記録します。
+end note
+@enduml
+```
+
+#### シーケンス図
+
+以下は、Decoratorパターンの実行フローを表すシーケンス図です：
+
+```plantuml
+@startuml
+actor Client
+participant "JournaledShape\n(Decorator)" as decorator
+participant "ConcreteShape\n(Square)" as concrete
+
+Client -> concrete : make-square([0, 0], 1)
+activate concrete
+concrete --> Client : square
+deactivate concrete
+
+Client -> decorator : make(square)
+activate decorator
+decorator --> Client : journaled-square
+deactivate decorator
+
+Client -> decorator : translate(journaled-square, 2, 3)
+activate decorator
+decorator -> decorator : journal.add([:translate, 2, 3])
+decorator -> concrete : translate(square, 2, 3)
+activate concrete
+concrete --> decorator : translated-square
+deactivate concrete
+decorator --> Client : updated-journaled-square
+deactivate decorator
+
+Client -> decorator : scale(journaled-square, 5)
+activate decorator
+decorator -> decorator : journal.add([:scale, 5])
+decorator -> concrete : scale(square, 5)
+activate concrete
+concrete --> decorator : scaled-square
+deactivate concrete
+decorator --> Client : updated-journaled-square
+deactivate decorator
+
+note right
+  デコレータは操作を委譲する前に
+  ジャーナルに記録します
 end note
 @enduml
 ```
