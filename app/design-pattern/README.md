@@ -10,6 +10,7 @@
 - Compositeパターン - オブジェクトをツリー構造で構成し、個々のオブジェクトとその集合を同じように扱う
 - Decoratorパターン - 既存のオブジェクトに新しい機能を動的に追加する
 - Abstract Serverパターン - アルゴリズムのファミリーを定義し、それぞれをカプセル化して交換可能にする
+- Commandパターン - 要求をオブジェクトとしてカプセル化し、実行や取り消しなどの操作を可能にする
 
 以下、各パターンの詳細な説明と実装例を示します。
 
@@ -639,6 +640,191 @@ note right
   プロトコルベースの実装では、
   戦略オブジェクトのメソッドを
   直接呼び出します
+end note
+@enduml
+```
+
+### Commandパターン
+
+Commandパターンは、要求をオブジェクトとしてカプセル化し、それによって異なる要求やキューイング、ログ記録、取り消し可能な操作などのパラメータ化されたクライアントを可能にするパターンです。このパターンを使用すると、操作の実行を要求するオブジェクトと、その操作を実際に実行するオブジェクトを分離できます。
+
+現在の実装では、GUIアプリケーションでの操作（部屋の追加など）とそのundo機能を実装しています。
+
+```clojure
+;; Commandインターフェース
+(defmulti execute :type)
+(defmulti undo :type)
+
+;; 具体的なコマンド（AddRoomCommand）
+(defn add-room []
+  ;stuff that adds rooms to the canvas
+  ;and returns added room
+  )
+
+(defn delete-room [room]
+  ;stuff that deletes the specified room from the canvas
+  )
+
+(defn make-add-room-command []
+  {:type :add-room-command})
+
+(defmethod execute :add-room-command [command]
+  (assoc (make-add-room-command) :the-added-room (add-room)))
+
+(defmethod undo :add-room-command [command]
+  (delete-room (:the-added-room command)))
+
+;; クライアント
+(defn some-app [command]
+  ;Some other stuff...
+  (command)
+  ;Some more other stuff...
+  )
+
+;; GUIアプリケーション（Invoker）
+(defn gui-app [actions]
+  (loop [actions actions
+         undo-list (list)]
+    (if (empty? actions)
+      :done-nl
+      (condp = (first actions)
+        :add-room-action
+        (let [executed-command (execute
+                                 (make-add-room-command))]
+          (recur (rest actions)
+                 (conj undo-list executed-command)))
+        :undo-action
+        (let [command-to-undo (first undo-list)]
+          (undo command-to-undo)
+          (recur (rest actions)
+                 (rest undo-list)))
+        :TILT))))
+```
+
+この実装では、マルチメソッドを使用してCommandパターンを実現しています。`execute`と`undo`マルチメソッドは、コマンドインターフェースを定義し、`:add-room-command`型のコマンドに対する具体的な実装を提供しています。
+
+`gui-app`関数は、アクションのリストを受け取り、それらを順番に処理します。`:add-room-action`アクションが来ると、新しいコマンドを作成して実行し、undo-listに追加します。`:undo-action`アクションが来ると、undo-listから最新のコマンドを取り出し、それを元に戻します。
+
+このパターンにより、GUIアプリケーションは実行される具体的な操作を知る必要がなく、単にコマンドを実行・元に戻すだけで済みます。また、新しい操作を追加する際には、新しいコマンド型を定義し、`execute`と`undo`マルチメソッドに対する実装を提供するだけで済みます。
+
+#### クラス図
+
+以下は、Commandパターンの実装を表すクラス図です：
+
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+interface "Command" as command {
+  +execute(command)
+  +undo(command)
+}
+
+class "AddRoomCommand" as addRoom {
+  +type: :add-room-command
+  +the-added-room
+  +execute(command)
+  +undo(command)
+}
+
+class "Client\n(some-app)" as client {
+  +some-app(command)
+}
+
+class "Invoker\n(gui-app)" as invoker {
+  +gui-app(actions)
+  +undo-list
+}
+
+class "Receiver\n(add-room/delete-room)" as receiver {
+  +add-room()
+  +delete-room(room)
+}
+
+command <|.. addRoom
+invoker --> command : uses
+addRoom --> receiver : uses
+client --> command : uses
+
+note right of command
+  Commandはマルチメソッドで
+  定義されたインターフェースで、
+  executeとundoメソッドを
+  提供します。
+end note
+
+note right of addRoom
+  AddRoomCommandは
+  Commandインターフェースを実装し、
+  add-roomとdelete-room関数を
+  呼び出します。
+end note
+
+note right of invoker
+  gui-app関数はアクションリストを
+  処理し、適切なコマンドを
+  実行・元に戻します。
+  また、undo-listを管理します。
+end note
+
+note right of receiver
+  add-roomとdelete-room関数は
+  実際の操作を実行します。
+end note
+
+note right of client
+  some-app関数はコマンドを
+  受け取り、それを実行します。
+end note
+@enduml
+```
+
+#### シーケンス図
+
+以下は、Commandパターンの実行フローを表すシーケンス図です：
+
+```plantuml
+@startuml
+actor User
+participant "Invoker\n(gui-app)" as invoker
+participant "Command\n(AddRoomCommand)" as command
+participant "Receiver\n(add-room/delete-room)" as receiver
+
+User -> invoker : gui-app([:add-room-action, :undo-action])
+activate invoker
+
+invoker -> command : make-add-room-command()
+activate command
+command --> invoker : command
+deactivate command
+
+invoker -> command : execute(command)
+activate command
+command -> receiver : add-room()
+activate receiver
+receiver --> command : room
+deactivate receiver
+command --> invoker : executed-command
+deactivate command
+
+invoker -> command : undo(command)
+activate command
+command -> receiver : delete-room(room)
+activate receiver
+receiver --> command : result
+deactivate receiver
+command --> invoker : result
+deactivate command
+
+invoker --> User : result
+deactivate invoker
+
+note right
+  Invokerはアクションに基づいて
+  コマンドを作成・実行し、
+  必要に応じて元に戻します。
+  Commandは実際の操作を
+  Receiverに委譲します。
 end note
 @enduml
 ```
