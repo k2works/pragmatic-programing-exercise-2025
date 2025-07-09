@@ -1,6 +1,6 @@
 (ns design-pattern.command.core)
 
-(defn execute []
+(defn execute [argument]
   )
 
 (defn some-app [command]
@@ -8,3 +8,4 @@
   (command)
   ;Some more other stuff...
   )
+
