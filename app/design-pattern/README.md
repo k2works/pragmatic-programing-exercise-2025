@@ -11,6 +11,7 @@
 - Decoratorパターン - 既存のオブジェクトに新しい機能を動的に追加する
 - Abstract Serverパターン - アルゴリズムのファミリーを定義し、それぞれをカプセル化して交換可能にする
 - Commandパターン - 要求をオブジェクトとしてカプセル化し、実行や取り消しなどの操作を可能にする
+- Visitorパターン - オブジェクト構造の要素に対して実行する操作を表現し、操作を変更せずに新しい操作を定義できるようにする
 
 以下、各パターンの詳細な説明と実装例を示します。
 
@@ -829,6 +830,192 @@ end note
 @enduml
 ```
 
+### Visitorパターン
+
+Visitorパターンは、オブジェクト構造の要素に対して実行する操作を表現し、操作を変更せずに新しい操作を定義できるようにするパターンです。このパターンを使用すると、操作の対象となるオブジェクト構造を変更せずに、新しい操作を追加できます。
+
+現在の実装では、異なる形状（円や四角形）をJSON形式に変換する操作を提供しています。
+
+```clojure
+;; 形状インターフェース
+(defmulti translate (fn [shape dx dy] (::type shape)))
+(defmulti scale (fn [shape factor] (::type shape)))
+
+;; 円の実装
+(defn make [center radius]
+  {::shape/type ::circle
+   ::center center
+   ::radius radius})
+
+(defmethod shape/translate ::circle [circle dx dy]
+  (let [[x y] (::center circle)]
+    (assoc circle ::center [(+ x dx) (+ y dy)])))
+
+(defmethod shape/scale ::circle [circle factor]
+  (let [radius (::radius circle)]
+    (assoc circle ::radius (* radius factor))))
+
+;; 四角形の実装
+(defn make [top-left side]
+  {::shape/type ::square
+   ::top-left top-left
+   ::side side})
+
+(defmethod shape/translate ::square [square dx dy]
+  (let [[x y] (::top-left square)]
+    (assoc square ::top-left [(+ x dx) (+ y dy)])))
+
+(defmethod shape/scale ::square [square factor]
+  (let [side (::side square)]
+    (assoc square ::side (* side factor))))
+
+;; Visitorインターフェース
+(defmulti to-json ::shape/type)
+
+;; 具体的なVisitor実装
+(defmethod to-json ::square/square [square]
+  (let [{:keys [::square/top-left ::square/side]} square
+        [x y] top-left]
+    (format "{\"top-left\":[%s,%s],\"side\": %s}" x y side)))
+
+(defmethod to-json ::circle/circle [circle]
+  (let [{:keys [::circle/center ::circle/radius]} circle
+        [x y] center]
+    (format "{\"center\":[%s,%s],\"radius\": %s}" x y radius)))
+
+;; Visitorの使用例
+(to-json (square/make [0 0] 1)) ;; => "{\"top-left\":[0,0],\"side\": 1}"
+(to-json (circle/make [3 4] 1)) ;; => "{\"center\":[3,4],\"radius\": 1}"
+```
+
+この実装では、マルチメソッドを使用してVisitorパターンを実現しています。`to-json`マルチメソッドは、異なる形状タイプに対して異なる実装を提供するVisitorです。
+
+各形状（円、四角形）は、自身の構造を変更せずに、Visitorによって新しい操作（JSON変換）を受け入れることができます。新しい形状タイプを追加する場合は、その形状に対する`to-json`メソッドを実装するだけで、既存のコードを変更せずに拡張できます。
+
+また、新しい操作（例えばXML変換）を追加したい場合は、新しいマルチメソッド（例えば`to-xml`）を定義し、各形状タイプに対する実装を提供するだけで、既存の形状クラスを変更せずに拡張できます。
+
+#### クラス図
+
+以下は、Visitorパターンの実装を表すクラス図です：
+
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+interface "Shape" as shape {
+  +translate(shape, dx, dy)
+  +scale(shape, factor)
+}
+
+class "Circle" as circle {
+  +center
+  +radius
+  +translate(circle, dx, dy)
+  +scale(circle, factor)
+}
+
+class "Square" as square {
+  +top-left
+  +side
+  +translate(square, dx, dy)
+  +scale(square, factor)
+}
+
+interface "ShapeVisitor" as visitor {
+  +to-json(shape)
+}
+
+class "JSONShapeVisitor" as jsonVisitor {
+  +to-json(circle)
+  +to-json(square)
+}
+
+shape <|.. circle
+shape <|.. square
+visitor <|.. jsonVisitor
+visitor --> shape : visits
+jsonVisitor --> circle : visits
+jsonVisitor --> square : visits
+
+note right of shape
+  Shapeはマルチメソッドで
+  定義されたインターフェースで、
+  translateとscaleメソッドを
+  提供します。
+end note
+
+note right of circle
+  Circleは中心点と半径を持ち、
+  Shapeインターフェースを実装します。
+end note
+
+note right of square
+  Squareは左上の座標と辺の長さを持ち、
+  Shapeインターフェースを実装します。
+end note
+
+note right of visitor
+  ShapeVisitorはマルチメソッドで
+  定義されたインターフェースで、
+  to-jsonメソッドを提供します。
+end note
+
+note right of jsonVisitor
+  JSONShapeVisitorはto-jsonメソッドの
+  具体的な実装を提供し、
+  各形状タイプに対して異なる
+  JSON変換処理を行います。
+end note
+@enduml
+```
+
+#### シーケンス図
+
+以下は、Visitorパターンの実行フローを表すシーケンス図です：
+
+```plantuml
+@startuml
+actor Client
+participant "JSONShapeVisitor\n(to-json)" as visitor
+participant "Circle" as circle
+participant "Square" as square
+
+Client -> circle : make([3, 4], 1)
+activate circle
+circle --> Client : circle
+deactivate circle
+
+Client -> square : make([0, 0], 1)
+activate square
+square --> Client : square
+deactivate square
+
+Client -> visitor : to-json(circle)
+activate visitor
+visitor -> circle : get center and radius
+activate circle
+circle --> visitor : [3, 4], 1
+deactivate circle
+visitor --> Client : "{\"center\":[3,4],\"radius\": 1}"
+deactivate visitor
+
+Client -> visitor : to-json(square)
+activate visitor
+visitor -> square : get top-left and side
+activate square
+square --> visitor : [0, 0], 1
+deactivate square
+visitor --> Client : "{\"top-left\":[0,0],\"side\": 1}"
+deactivate visitor
+
+note right
+  Clientは各形状オブジェクトを作成し、
+  Visitorを使用して形状をJSON形式に
+  変換します。Visitorは各形状タイプに
+  応じた処理を行います。
+end note
+@enduml
+```
 ## インストール
 
 [Clojure](https://clojure.org/guides/getting_started)とClojure CLIツールがインストールされていることを確認してください。
