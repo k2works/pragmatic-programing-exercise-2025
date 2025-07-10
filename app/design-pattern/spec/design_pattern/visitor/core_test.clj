@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [design-pattern.visitor.circle :as circle]
             [design-pattern.visitor.square :as square]
+            [design-pattern.visitor.main]
             [design-pattern.visitor.json-shape-visitor :as jv]))
 
 (deftest shape-visitor-test

@@ -2,6 +2,7 @@
   (:require [design-pattern.visitor.circle :as circle]
             [design-pattern.visitor.square :as square]
             [design-pattern.visitor.json-shape-visitor :as jv]
+            [design-pattern.visitor.main]
             [speclj.core :refer :all]))
 
 (describe "shape-visitor"
