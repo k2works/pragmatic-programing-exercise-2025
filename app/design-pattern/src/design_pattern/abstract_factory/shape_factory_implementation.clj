@@ -7,10 +7,9 @@
 (defn make []
   {::factory/type ::implementation})
 
-(defmethod factory/make-square ::implementation
-  [factory top-left side]
-  (square/make top-left side))
+(defmethod factory/make ::implementation
+  [factory type & args]
+  (condp = type
+    :square (apply square/make args)
+    :circle (apply circle/make args)))
 
-(defmethod factory/make-circle ::implementation
-  [factory center radius]
-  (circle/make center radius))
