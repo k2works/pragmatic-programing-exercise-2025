@@ -7,6 +7,7 @@
 このプロジェクトでは、以下のデザインパターンの実装を提供しています：
 
 - Adapterパターン - 互換性のないインターフェースを持つクラス同士を連携させる
+- Abstract Factoryパターン - 関連するオブジェクトのファミリーを、具体的なクラスを指定せずに生成するためのインターフェースを提供する
 - Compositeパターン - オブジェクトをツリー構造で構成し、個々のオブジェクトとその集合を同じように扱う
 - Decoratorパターン - 既存のオブジェクトに新しい機能を動的に追加する
 - Abstract Serverパターン - アルゴリズムのファミリーを定義し、それぞれをカプセル化して交換可能にする
@@ -154,6 +155,214 @@ note right
   アダプターは、Switchableインターフェースの
   メソッド呼び出しをVariableLightの
   適切なメソッド呼び出しに変換します
+end note
+@enduml
+```
+
+### Abstract Factoryパターン
+
+Abstract Factoryパターンは、関連するオブジェクトのファミリーを、具体的なクラスを指定せずに生成するためのインターフェースを提供するパターンです。このパターンを使用すると、クライアントは生成されるオブジェクトの具体的なクラスを知ることなく、関連するオブジェクトを生成できます。
+
+現在の実装では、異なる形状（円や四角形）を生成するファクトリーを提供しています。
+
+```clojure
+;; 形状ファクトリーインターフェース
+(defmulti make (fn [factory type & args] (::type factory)))
+
+;; 形状インターフェース
+(defmulti translate (fn [shape dx dy] (::type shape)))
+(defmulti scale (fn [shape factor] (::type shape)))
+(defmulti to-string (fn [shape] (::type shape)))
+
+;; 円の実装
+(defn make-circle [center radius]
+  {::shape/type ::circle
+   ::center center
+   ::radius radius})
+
+(defmethod shape/translate ::circle [circle dx dy]
+  (let [[x y] (::center circle)]
+    (assoc circle ::center [(+ x dx) (+ y dy)])))
+
+(defmethod shape/scale ::circle [circle factor]
+  (let [radius (::radius circle)]
+    (assoc circle ::radius (* radius factor))))
+
+(defmethod shape/to-string ::circle [circle]
+  (let [[x y] (::center circle)
+        radius (::radius circle)]
+    (str "Circle center: [" x ", " y "] radius: " radius)))
+
+;; 四角形の実装
+(defn make-square [top-left side]
+  {::shape/type ::square
+   ::top-left top-left
+   ::side side})
+
+(defmethod shape/translate ::square [square dx dy]
+  (let [[x y] (::top-left square)]
+    (assoc square ::top-left [(+ x dx) (+ y dy)])))
+
+(defmethod shape/scale ::square [square factor]
+  (let [side (::side square)]
+    (assoc square ::side (* side factor))))
+
+(defmethod shape/to-string ::square [square]
+  (let [[x y] (::top-left square)
+        side (::side square)]
+    (str "Square top-left: [" x ", " y "] side: " side)))
+
+;; 形状ファクトリーの実装
+(defn make-factory []
+  {::factory/type ::implementation})
+
+(defmethod factory/make ::implementation
+  [factory type & args]
+  (condp = type
+    :square (apply square/make args)
+    :circle (apply circle/make args)))
+
+;; クライアント
+(def shape-factory (atom nil))
+
+(defn init []
+  (reset! shape-factory (make-factory)))
+
+;; 使用例
+(let [square (factory/make @shape-factory :square [100 100] 10)
+      circle (factory/make @shape-factory :circle [100 100] 10)]
+  (println (shape/to-string square))
+  (println (shape/to-string circle)))
+```
+
+この実装では、マルチメソッドを使用してAbstract Factoryパターンを実現しています。`make`という共通のファクトリーインターフェースを定義し、具体的なファクトリー実装がこのインターフェースを実装しています。
+
+ファクトリーは、要求された型（:squareや:circle）に基づいて適切な形状オブジェクトを生成します。クライアントは、具体的な形状クラスを知ることなく、ファクトリーを通じて形状オブジェクトを生成できます。
+
+#### クラス図
+
+以下は、Abstract Factoryパターンの実装を表すクラス図です：
+
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+interface "ShapeFactory" as factory {
+  +make(factory, type, args)
+}
+
+class "ShapeFactoryImplementation" as factoryImpl {
+  +make(factory, type, args)
+}
+
+interface "Shape" as shape {
+  +translate(shape, dx, dy)
+  +scale(shape, factor)
+  +to-string(shape)
+}
+
+class "Circle" as circle {
+  +center
+  +radius
+  +translate(circle, dx, dy)
+  +scale(circle, factor)
+  +to-string(circle)
+}
+
+class "Square" as square {
+  +top-left
+  +side
+  +translate(square, dx, dy)
+  +scale(square, factor)
+  +to-string(square)
+}
+
+class "Client" as client {
+  +shape-factory
+  +init()
+}
+
+factoryImpl ..|> factory
+circle ..|> shape
+square ..|> shape
+factory ..> shape : creates
+client --> factory : uses
+
+note right of factory
+  ShapeFactoryは形状オブジェクトを
+  生成するためのインターフェースを
+  提供します。
+end note
+
+note right of factoryImpl
+  ShapeFactoryImplementationは
+  具体的な形状オブジェクトを
+  生成する実装を提供します。
+end note
+
+note right of shape
+  Shapeは全ての形状が
+  実装すべきインターフェースを
+  定義します。
+end note
+
+note right of client
+  Clientはファクトリーを使用して
+  形状オブジェクトを生成し、
+  具体的な形状クラスを
+  知る必要はありません。
+end note
+@enduml
+```
+
+#### シーケンス図
+
+以下は、Abstract Factoryパターンの実行フローを表すシーケンス図です：
+
+```plantuml
+@startuml
+actor User
+participant "Client" as client
+participant "ShapeFactory" as factory
+participant "Circle" as circle
+participant "Square" as square
+
+User -> client : init()
+activate client
+client -> factory : make()
+activate factory
+factory --> client : factory instance
+deactivate factory
+client --> User : 初期化完了
+deactivate client
+
+User -> client : create shapes
+activate client
+client -> factory : make(factory, :circle, [100 100], 10)
+activate factory
+factory -> circle : make([100 100], 10)
+activate circle
+circle --> factory : circle instance
+deactivate circle
+factory --> client : circle instance
+deactivate factory
+
+client -> factory : make(factory, :square, [100 100], 10)
+activate factory
+factory -> square : make([100 100], 10)
+activate square
+square --> factory : square instance
+deactivate square
+factory --> client : square instance
+deactivate factory
+
+client --> User : created shapes
+deactivate client
+
+note right
+  クライアントはファクトリーを通じて
+  形状オブジェクトを生成し、
+  具体的な形状クラスを知る必要はありません
 end note
 @enduml
 ```
