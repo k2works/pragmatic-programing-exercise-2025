@@ -4,7 +4,8 @@
             [wator
              [cell :as cell]
              [water :as water]
-             [fish :as fish]]))
+             [fish :as fish]
+             [world :as world]]))
 
 (deftest water-test
   (testing "water usually remains water"
@@ -18,3 +19,13 @@
       (let [water (water/make)
             evolved (cell/tick water)]
         (is (= ::fish/fish (::cell/type evolved)))))))
+
+(deftest world-test
+  (testing "creates a world full of water cells"
+    (let [world (world/make 2 2)
+          cells (:cells world)
+          positions (set (keys cells))]
+      (is (= #{[0 0] [0 1]
+               [1 0] [1 1]} positions))
+      (is (every? #(= ::water/water (::cell/type %))
+                  (vals cells))))))

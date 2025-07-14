@@ -4,7 +4,8 @@
             [wator
              [cell :as cell]
              [water :as water]
-             [fish :as fish]]))
+             [fish :as fish]
+             [world :as world]]))
 
 (describe "Wator"
           (with-stubs)
@@ -18,4 +19,13 @@
                        (with-redefs [rand (stub :rand {:return 1.0})]
                          (let [water (water/make)
                                evolved (cell/tick water)]
-                           (should= ::fish/fish (::cell/type evolved)))))))
+                           (should= ::fish/fish (::cell/type evolved))))))
+          (context "world"
+                   (it "creates a world full of water cells"
+                       (let [world (world/make 2 2)
+                             cells (:cells world)
+                             positions (set (keys cells))]
+                         (should= #{[0 0] [0 1]
+                                    [1 0] [1 1]}positions)
+                         (should (every? #(= ::water/water (::cell/type %))
+                                          (vals cells)))))))
