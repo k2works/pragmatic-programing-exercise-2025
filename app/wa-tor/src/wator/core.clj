@@ -1,10 +1,10 @@
-(ns wa-tor.core)
+(ns wator.core)
 
-;; Wa-Tor is a population dynamics simulation devised by A. K. Dewdney
-;; This is the core namespace for the Wa-Tor simulation
+;; Wator is a population dynamics simulation devised by A. K. Dewdney
+;; This is the core namespace for the Wator simulation
 
 (defn create-world
-  "Creates a new Wa-Tor world with the specified dimensions"
+  "Creates a new Wator world with the specified dimensions"
   [width height]
   {:width width
    :height height
@@ -26,6 +26,6 @@
     (assoc world :cells new-cells)))
 
 (defn -main
-  "Main entry point for the Wa-Tor simulation"
+  "Main entry point for the Wator simulation"
   [& args]
-  (println "Starting Wa-Tor simulation..."))
+  (println "Starting Wator simulation..."))

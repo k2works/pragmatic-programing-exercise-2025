@@ -44,9 +44,9 @@ Animal <|-- Fish
 
 ## 実装
 
-このプロジェクトはClojureでWa-Torシミュレーションを実装しています。主要なコンポーネントは以下の通りです：
+このプロジェクトはClojureでWatorシミュレーションを実装しています。主要なコンポーネントは以下の通りです：
 
-- `wa-tor.core`：世界のグリッドを作成および操作するためのコア機能
+- `wator.core`：世界のグリッドを作成および操作するためのコア機能
 - 特定のシミュレーションコンポーネント（魚、サメなど）のための追加の名前空間
 
 ## 使用方法
@@ -54,7 +54,7 @@ Animal <|-- Fish
 シミュレーションを実行するには：
 
 ```bash
-clj -M -m wa-tor.core
+clj -M -m wator.core
 ```
 
 ## テスト
@@ -73,4 +73,4 @@ clj -M:test
 
 ## 参考文献
 
-- [WikipediaのWa-Tor](https://en.wikipedia.org/wiki/Wa-Tor)
+- [WikipediaのWator](https://en.wikipedia.org/wiki/Wa-Tor)

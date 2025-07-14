@@ -1,8 +1,8 @@
-(ns wa-tor.core-spec
+(ns wator.core-spec
   (:require [speclj.core :refer :all]
-            [wa-tor.core :refer :all]))
+            [wator.core :refer :all]))
 
-(describe "Wa-Tor World"
+(describe "Wator World"
   (it "creates a world with the specified dimensions"
     (let [world (create-world 10 10)]
       (should= 10 (:width world))

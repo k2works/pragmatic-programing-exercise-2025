@@ -1,6 +1,6 @@
-(ns wa-tor.core-test
+(ns wator.core-test
   (:require [clojure.test :refer :all]
-            [wa-tor.core :refer :all]))
+            [wator.core :refer :all]))
 
 (deftest create-world-test
   (testing "Creating a world with specified dimensions"
