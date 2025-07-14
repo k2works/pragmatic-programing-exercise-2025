@@ -16,6 +16,32 @@ Wa-Torは、Alexander K. Dewdneyによって考案され、1984年12月のScient
    - サメは時間の経過とともにエネルギーを失い、エネルギーがゼロになると死にます。
 3. 魚とサメの両方が一定の時間ステップ後に繁殖します。
 
+## 設計
+
+```plantuml
+class World
+abstract class Cell {
++ Tick
+}
+class Water
+abstract class Animal {
++ Move
++ Reproduce
+}
+class Shark {
++ Eat
+}
+class Fish
+
+World -> "*" Cell
+Cell <|-- Water
+Cell <|-- Animal
+Animal <|-- Shark
+Animal <|-- Fish
+
+
+```
+
 ## 実装
 
 このプロジェクトはClojureでWa-Torシミュレーションを実装しています。主要なコンポーネントは以下の通りです：
