@@ -1,5 +1,12 @@
 (ns wator.world
-  (:require [wator.water :as water]))
+  (:require [clojure.spec.alpha :as s]
+            [wator.cell :as cell]
+            [wator.water :as water]))
+
+(s/def ::location (s/tuple int? int?))
+(s/def ::cell #(contains? % ::cell/type))
+(s/def ::bounds ::location)
+(s/def ::world (s/keys :req [::cells ::bounds]))
 
 (defn make [w h]
   (let [locs (for [x (range w) y (range h)] [x y])
