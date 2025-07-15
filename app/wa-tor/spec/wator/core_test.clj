@@ -2,11 +2,12 @@
   (:require [clojure.test :refer :all]
             [wator.core :refer :all]
             [wator.animal :as animal]
-            [wator
-             [cell :as cell]
-             [water :as water]
-             [fish :as fish]
-             [world :as world]]))
+            [wator.cell :as cell]
+            [wator.water :as water]
+            [wator.fish :as fish]
+            [wator.world :as world]
+            [wator.water-imp]
+            [wator.fish-imp]))
 
 (deftest water-test
   (testing "water usually remains water"

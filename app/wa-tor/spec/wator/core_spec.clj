@@ -2,11 +2,12 @@
   (:require [speclj.core :refer :all]
             [wator.animal :as animal]
             [wator.core :refer :all]
-            [wator
-             [cell :as cell]
-             [water :as water]
-             [fish :as fish]
-             [world :as world]]))
+            [wator.cell :as cell]
+            [wator.water :as water]
+            [wator.fish :as fish]
+            [wator.world :as world]
+            [wator.water-imp]
+            [wator.fish-imp]))
 
 (describe "Wator"
           (with-stubs)
@@ -27,7 +28,7 @@
                              cells (:cells world)
                              positions (set (keys cells))]
                          (should= #{[0 0] [0 1]
-                                    [1 0] [1 1]}positions)
+                                    [1 0] [1 1]} positions)
                          (should (every? #(= ::water/water (::cell/type %))
                                           (vals cells))))))
           (context "animal"
