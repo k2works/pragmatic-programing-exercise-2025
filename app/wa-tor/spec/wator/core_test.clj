@@ -1,6 +1,7 @@
 (ns wator.core-test
   (:require [clojure.test :refer :all]
             [wator.core :refer :all]
+            [wator.animal :as animal]
             [wator
              [cell :as cell]
              [water :as water]
@@ -29,3 +30,14 @@
                [1 0] [1 1]} positions))
       (is (every? #(= ::water/water (::cell/type %))
                   (vals cells))))))
+
+(deftest animal-test
+  (testing "animal moves"
+    (let [fish (fish/make)
+          world (-> (world/make 3 3)
+                    (world/set-cell [1 1] fish))
+          [loc cell] (animal/move fish [1 1] world)]
+      (is (= cell fish))
+      (is (contains? #{[0 0] [0 1] [0 2]
+                       [1 0] [1 2]
+                       [2 0] [2 1] [2 2]} loc)))))

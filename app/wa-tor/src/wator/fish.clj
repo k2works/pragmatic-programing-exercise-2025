@@ -9,8 +9,8 @@
   (animal/tick fish)
   )
 
-(defmethod animal/move ::fish [fish]
-  )
+(defmethod animal/move ::fish [fish loc world]
+  (animal/do-move fish loc world))
 
 (defmethod animal/reproduce ::fish [fish]
   )

@@ -6,3 +6,6 @@
         loc-water (interleave locs (repeat (water/make)))
         cells (apply hash-map loc-water)]
     {:cells cells}))
+
+(defn set-cell [world loc cell]
+  (assoc-in world [:cells loc] cell))

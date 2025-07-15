@@ -3,6 +3,8 @@
              [cell :as cell]
              [animal :as animal]]))
 
+(defn make [] {::cell/type ::shark})
+
 (defmethod cell/tick ::shark [shark]
   (animal/tick shark)
   )
