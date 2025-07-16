@@ -17,13 +17,18 @@
                    (it "usually remains water"
                        (with-redefs [rand (stub :rand {:return 0.0})]
                          (let [water (water/make)
-                               evolved (cell/tick water)]
-                           (should= ::water/water (::cell/type evolved)))))
+                               world (world/make 1 1)
+                               [from to] (cell/tick water [0 0] world)]
+                           (should-be-nil from)
+                           (should (water/is? (get to [0 0])))
+                           )))
                    (it "occasionally evolves into a fish"
                        (with-redefs [rand (stub :rand {:return 1.0})]
                          (let [water (water/make)
-                               evolved (cell/tick water)]
-                           (should= ::fish/fish (::cell/type evolved))))))
+                               world (world/make 1 1)
+                               [from to] (cell/tick water [0 0] world)]
+                           (should-be-nil from)
+                           (should (fish/is? (get to [0 0])))))))
           (context "world"
                    (it "creates a world full of water cells"
                        (let [world (world/make 2 2)
@@ -38,11 +43,20 @@
                        (let [fish (fish/make)
                              world (-> (world/make 3 3)
                                        (world/set-cell [1 1] fish))
-                             [loc cell] (animal/move fish [1 1] world)]
-                         (should= cell fish)
+                             [from to] (animal/move fish [1 1] world)
+                             loc (first (keys to))]
+                         (should (water/is? (get from [1 1])))
+                         (should (fish/is? (get to loc)))
                          (should (#{[0 0] [0 1] [0 2]
                                     [1 0] [1 2]
                                     [2 0] [2 1] [2 2]} loc))))
+                   (it "doesn't move if there are no space"
+                       (let [fish (fish/make)
+                             world (-> (world/make 1 1)
+                                       (world/set-cell [0 0] fish))
+                             [from to] (animal/move fish [0 0] world)]
+                         (should (fish/is? (get to [0 0])))
+                         (should (nil? from))))
                    (it "reproduces"
                        (let [fish (fish/make)
                              world (-> (world/make 3 3)
@@ -91,4 +105,35 @@
                              occupied-cell (world/get-cell small-world [0 1])]
                          (should (water/is? vacated-cell))
                          (should (fish/is? occupied-cell))
-                         (should= 1 (animal/age occupied-cell))))))
+                         (should= 1 (animal/age occupied-cell))))
+                   (it "moves a fish around each tick"
+                       (doseq [scenario
+                               [{:dimension [2 1] :starting [0 0] :ending [1 0]}
+                                {:dimension [2 1] :starting [1 0] :ending [0 0]}
+                                {:dimension [1 2] :starting [0 0] :ending [0 1]}
+                                {:dimension [1 2] :starting [0 1] :ending [0 0]}]]
+                         (let [fish (fish/make)
+                               {:keys [dimension starting ending]} scenario
+                               [h w] dimension
+                               small-world (-> (world/make h w)
+                                               (world/set-cell starting fish)
+                                               (world/tick))
+                               vacated-cell (world/get-cell small-world starting)
+                               occupied-cell (world/get-cell small-world ending)]
+                           (should (water/is? vacated-cell))
+                           (should (fish/is? occupied-cell))
+                           (should= 1 (animal/age occupied-cell)))))
+                   (it "move two fish who compete for the same spot"
+                       (let [fish (fish/make)
+                             competitive-world (-> (world/make 3 1)
+                                                   (world/set-cell [0 0] fish)
+                                                   (world/set-cell [2 0] fish)
+                                                   (world/tick))
+                             start-00 (world/get-cell competitive-world [0 0])
+                             start-20 (world/get-cell competitive-world [2 0])
+                             end-10 (world/get-cell competitive-world [1 0])]
+                         (should (fish/is? end-10))
+                         (should (or (fish/is? start-00)
+                                     (fish/is? start-20)))
+                         (should (or (water/is? start-00)
+                                     (water/is? start-20)))))))

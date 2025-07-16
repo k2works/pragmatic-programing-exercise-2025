@@ -1,3 +1,3 @@
 (ns wator.cell)
-(defmulti tick ::type)
+(defmulti tick (fn [cell & _] (::type cell)))
 

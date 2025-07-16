@@ -7,15 +7,16 @@
 (s/def ::cell #(contains? % ::cell/type))
 (s/def ::bounds ::location)
 (s/def ::world (s/and (s/keys :req [::cells ::bounds])
-                      #(= (::type %)::world)))
+                      #(= (::type %) :wator.world/world)))
 
 (defmulti tick ::type)
-
+(defmulti make-cell (fn [factory-type cell-type] factory-type))
 (defn make [w h]
   (let [locs (for [x (range w) y (range h)] [x y])
-        loc-water (interleave locs (repeat (water/make)))
+        default-cell (make-cell :wator.world/world :default-cell)
+        loc-water (interleave locs (repeat default-cell))
         cells (apply hash-map loc-water)]
-    {::type ::world
+    {::type :wator.world/world
      ::cells cells
      ::bounds [w h]}))
 

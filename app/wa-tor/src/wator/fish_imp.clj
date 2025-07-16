@@ -5,13 +5,13 @@
             [wator.config :as config]
             [wator.world :as world]))
 
-(defmethod cell/tick ::fish/fish [fish]
-  (animal/tick fish))
+(defmethod cell/tick :wator.fish/fish [fish loc world]
+  (animal/tick fish loc world))
 
-(defmethod animal/move ::fish/fish [fish loc world]
+(defmethod animal/move :wator.fish/fish [fish loc world]
   (animal/do-move fish loc world))
 
-(defmethod animal/reproduce ::fish/fish [fish loc world]
+(defmethod animal/reproduce :wator.fish/fish [fish loc world]
   (let [special-case? (and (= loc [1 1])
                           (= (count (::world/cells world)) 9)
                           (= (animal/age fish) 0))]

@@ -24,15 +24,28 @@
 (defn tick [animal]
   )
 
+(defn increment-age [animal]
+  (update animal ::age inc))
+
+(defn tick [animal loc world]
+  (-> animal
+      increment-age
+      (move loc world)))
+
 (defn do-move [animal loc world]
   (let [neighbors (world/neighbors world loc)
-
+        moved-into (get world :moved-into #{})
+        available-neighbors (remove moved-into neighbors)
         destinations (filter
                        #(water/is?
                           (world/get-cell world %))
-                       neighbors)
-        new-location (rand-nth destinations)]
-    [new-location animal]))
+                       available-neighbors)]
+    (if (empty? destinations)
+      [nil {loc animal}]
+      (let [new-location (rand-nth destinations)]
+        (if (= new-location loc)
+          [nil {loc animal}]
+          [{loc (water/make)} {new-location animal}])))))
 
 (defn do-reproduce [animal loc world]
   (let [neighbors (world/neighbors world loc)

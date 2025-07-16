@@ -3,7 +3,7 @@
             [wator.fish :as fish]
             [wator.config :as config]))
 
-(defmethod cell/tick :wator.water/water [water]
+(defmethod cell/tick :wator.water/water [water loc world]
   (if (> (rand) config/water-evolution-rate)
-    (fish/make)
-    water))
+    [nil {loc (fish/make)}]
+    [nil {loc water}]))
