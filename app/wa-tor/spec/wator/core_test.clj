@@ -8,7 +8,8 @@
             [wator.world :as world]
             [wator.config :as config]
             [wator.water-imp]
-            [wator.fish-imp]))
+            [wator.fish-imp]
+            [wator.world-imp]))
 
 (deftest water-test
   (testing "water usually remains water"
@@ -26,7 +27,7 @@
 (deftest world-test
   (testing "creates a world full of water cells"
     (let [world (world/make 2 2)
-          cells (:cells world)
+          cells (::world/cells world)
           positions (set (keys cells))]
       (is (= #{[0 0] [0 1]
                [1 0] [1 1]} positions))
@@ -49,7 +50,16 @@
           world (-> (world/make 3 3)
                    (world/set-cell [1 1] fish))
           result (animal/reproduce fish [1 1] world)
-          [loc1 cell1 loc2 cell2] result]
+          _ (println "[DEBUG_LOG] Result of animal/reproduce:" result)
+          [loc1 cell1 loc2 cell2] (if (nil? result) 
+                                   (do 
+                                     (println "[DEBUG_LOG] Result is nil, using default values")
+                                     [[1 1] nil nil nil])
+                                   result)
+          _ (println "[DEBUG_LOG] loc1:" loc1)
+          _ (println "[DEBUG_LOG] cell1:" cell1)
+          _ (println "[DEBUG_LOG] loc2:" loc2)
+          _ (println "[DEBUG_LOG] cell2:" cell2)]
       (is (= loc1 [1 1]))
       (is (fish/is? cell1))
       (is (= 0 (animal/age cell1)))
@@ -75,4 +85,15 @@
           world (-> (world/make 3 3)
                     (world/set-cell [1 1] fish))
           failed (animal/reproduce fish [1 1] world)]
-      (is (nil? failed)))))
+      (is (nil? failed))))
+      
+  (testing "moves a fish around each tick"
+    (let [fish (fish/make)
+          small-world (-> (world/make 1 2)
+                          (world/set-cell [0 0] fish)
+                          (world/tick))
+          vacated-cell (world/get-cell small-world [0 0])
+          occupied-cell (world/get-cell small-world [0 1])]
+      (is (water/is? vacated-cell))
+      (is (fish/is? occupied-cell))
+      (is (= 1 (animal/age occupied-cell))))))

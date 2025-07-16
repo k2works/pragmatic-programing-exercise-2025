@@ -6,20 +6,24 @@
 (s/def ::location (s/tuple int? int?))
 (s/def ::cell #(contains? % ::cell/type))
 (s/def ::bounds ::location)
-(s/def ::world (s/keys :req [::cells ::bounds]))
+(s/def ::world (s/and (s/keys :req [::cells ::bounds])
+                      #(= (::type %)::world)))
+
+(defmulti tick ::type)
 
 (defn make [w h]
   (let [locs (for [x (range w) y (range h)] [x y])
         loc-water (interleave locs (repeat (water/make)))
         cells (apply hash-map loc-water)]
-    {:cells cells
+    {::type ::world
+     ::cells cells
      ::bounds [w h]}))
 
 (defn set-cell [world loc cell]
-  (assoc-in world [:cells loc] cell))
+  (assoc-in world [::cells loc] cell))
 
 (defn get-cell [world loc]
-  (get-in world [:cells loc]))
+  (get-in world [::cells loc]))
 
 (defn wrap [world [x y]]
   (let [[w h] (::bounds world)]

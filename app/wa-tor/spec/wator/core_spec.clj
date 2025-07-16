@@ -8,7 +8,8 @@
             [wator.world :as world]
             [wator.config :as config]
             [wator.water-imp]
-            [wator.fish-imp]))
+            [wator.fish-imp]
+            [wator.world-imp]))
 
 (describe "Wator"
           (with-stubs)
@@ -26,7 +27,7 @@
           (context "world"
                    (it "creates a world full of water cells"
                        (let [world (world/make 2 2)
-                             cells (:cells world)
+                             cells (::world/cells world)
                              positions (set (keys cells))]
                          (should= #{[0 0] [0 1]
                                     [1 0] [1 1]} positions)
@@ -80,4 +81,14 @@
                              world (-> (world/make 3 3)
                                        (world/set-cell [1 1] fish))
                              failed (animal/reproduce fish [1 1] world)]
-                         (should-be-nil failed)))))
+                         (should-be-nil failed)))
+                   (it "moves a fish around each tick"
+                       (let [fish (fish/make)
+                             small-world (-> (world/make 1 2)
+                                             (world/set-cell [0 0] fish)
+                                             (world/tick))
+                             vacated-cell (world/get-cell small-world [0 0])
+                             occupied-cell (world/get-cell small-world [0 1])]
+                         (should (water/is? vacated-cell))
+                         (should (fish/is? occupied-cell))
+                         (should= 1 (animal/age occupied-cell))))))
