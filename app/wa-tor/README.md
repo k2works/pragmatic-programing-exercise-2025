@@ -19,11 +19,15 @@ Wa-Torは、Alexander K. Dewdneyによって考案され、1984年12月のScient
 ## 設計
 
 ```plantuml
-class World
+abstract class World {
++ Tick = 0
++ MakeCell = 0
+}
 abstract class Cell {
 + Tick
 }
 class Water
+class WaterImp
 abstract class Animal {
 + Move
 + Reproduce
@@ -31,9 +35,25 @@ abstract class Animal {
 class Shark {
 + Eat
 }
+class SharkImp
 class Fish
+class FishImp
+class WorldImp{
++ Tick
++ MakeCell
+}
 
-World -> "*" Cell
+World -> Cell
+World <|--- WorldImp
+World <- Animal
+Water <- Animal
+Water <|-- WorldImp
+Water <-- WaterImp
+WaterImp -> Fish
+WorldImp -> Fish
+WorldImp -> SharkImp
+Fish <-- FishImp
+Shark <-- SharkImp
 Cell <|-- Water
 Cell <|-- Animal
 Animal <|-- Shark
