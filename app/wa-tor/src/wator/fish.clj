@@ -1,17 +1,18 @@
 (ns wator.fish
   (:require [clojure.spec.alpha :as s]
-            [wator.cell :as cell]
-            [wator.animal :as animal]))
+            [wator
+             [cell :as cell]
+             [animal :as animal]]))
 
-(s/def ::fish (s/and #(= :wator.fish/fish (::cell/type %)) ::animal/animal))
-
+(s/def ::fish (s/and #(= ::fish (::cell/type %))
+                     ::animal/animal))
 (defn is? [cell]
-  (= :wator.fish/fish (::cell/type cell)))
+  (= ::fish (::cell/type cell)))
 
 (defn make []
-  {:post [s/valid? ::fish %]}
-  (merge {::cell/type :wator.fish/fish}
+  {:post [(s/valid? ::fish %)]}
+  (merge {::cell/type ::fish}
          (animal/make)))
 
-(defmethod animal/make-child :wator.fish/fish [fish]
+(defmethod animal/make-child ::fish [fish]
   (make))

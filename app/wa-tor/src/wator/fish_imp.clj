@@ -1,20 +1,15 @@
 (ns wator.fish-imp
-  (:require [wator.cell :as cell]
-            [wator.fish :as fish]
-            [wator.animal :as animal]
-            [wator.config :as config]
-            [wator.world :as world]))
+  (:require [wator
+             [cell :as cell]
+             [animal :as animal]
+             [fish :as fish]]))
 
-(defmethod cell/tick :wator.fish/fish [fish loc world]
-  (animal/tick fish loc world))
+(defmethod cell/tick ::fish/fish [fish loc world]
+  (animal/tick fish loc world)
+  )
 
-(defmethod animal/move :wator.fish/fish [fish loc world]
+(defmethod animal/move ::fish/fish [fish loc world]
   (animal/do-move fish loc world))
 
-(defmethod animal/reproduce :wator.fish/fish [fish loc world]
-  (let [special-case? (and (= loc [1 1])
-                          (= (count (::world/cells world)) 9)
-                          (= (animal/age fish) 0))]
-    (if (or special-case? (>= (animal/age fish) config/fish-reproduction-age))
-      (animal/do-reproduce fish loc world)
-      nil)))
+(defmethod animal/reproduce ::fish/fish [fish loc world]
+  (animal/do-reproduce fish loc world))

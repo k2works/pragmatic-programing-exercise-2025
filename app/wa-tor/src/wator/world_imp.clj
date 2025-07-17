@@ -1,18 +1,17 @@
 (ns wator.world-imp
-  (:require [wator.animal :as animal]
-            [wator.cell :as cell]
-            [wator.fish :as fish]
-            [wator.shark :as shark]
-            [wator.water :as water]
-            [wator.world :as world :refer :all]))
+  (:require [wator
+             [world :as world :refer :all]
+             [cell :as cell]
+             [fish :as fish]
+             [shark :as shark]
+             [water :as water]]))
 
-(defmethod world/tick :wator.world/world [world]
+(defmethod world/tick ::world/world [world]
   (let [cells (::world/cells world)]
     (loop [locs (keys cells)
            new-cells {}
            moved-into #{}]
       (cond
-
         (empty? locs)
         (assoc world ::world/cells new-cells)
 
@@ -29,13 +28,11 @@
               moved-into (if (water/is? to-cell)
                            moved-into
                            (conj moved-into to-loc))]
-          (recur (rest locs)
-                 new-cells
-                 moved-into))))))
+          (recur (rest locs) new-cells moved-into))))))
 
-(defmethod world/make-cell :wator.world/world [world cell-type]
+(defmethod world/make-cell ::world/world [world cell-type]
   (condp = cell-type
-         :default-cell (water/make)
-         :water (water/make)
-         :fish (fish/make)
-         :shark (shark/make)))
+    :default-cell (water/make)
+    :water (water/make)
+    :fish (fish/make)
+    :shark (shark/make)))

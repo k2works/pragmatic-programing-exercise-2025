@@ -36,7 +36,22 @@
       (is (= #{[0 0] [0 1]
                [1 0] [1 1]} positions))
       (is (every? #(= ::water/water (::cell/type %))
-                  (vals cells))))))
+                  (vals cells)))))
+                  
+  (testing "makes neighbors"
+    (let [world (world/make 5 5)]
+      (is (= [[0 0] [0 1] [0 2]
+              [1 0] [1 2]
+              [2 0] [2 1] [2 2]]
+             (world/neighbors world [1 1])))
+      (is (= [[4 4] [4 0] [4 1]
+              [0 4] [0 1]
+              [1 4] [1 0] [1 1]]
+             (world/neighbors world [0 0])))
+      (is (= [[3 3] [3 4] [3 0]
+              [4 3] [4 0]
+              [0 3] [0 4] [0 0]]
+             (world/neighbors world [4 4]))))))
 
 (deftest animal-test
   (testing "animal moves"
@@ -60,29 +75,23 @@
       (is (nil? from))))
 
   (testing "animal reproduces"
-    (let [fish (fish/make)
+    (let [fish (-> (fish/make) (animal/set-age config/fish-reproduction-age))
           world (-> (world/make 3 3)
                    (world/set-cell [1 1] fish))
-          result (animal/reproduce fish [1 1] world)
-          _ (println "[DEBUG_LOG] Result of animal/reproduce:" result)
-          [loc1 cell1 loc2 cell2] (if (nil? result) 
-                                   (do 
-                                     (println "[DEBUG_LOG] Result is nil, using default values")
-                                     [[1 1] nil nil nil])
-                                   result)
-          _ (println "[DEBUG_LOG] loc1:" loc1)
-          _ (println "[DEBUG_LOG] cell1:" cell1)
-          _ (println "[DEBUG_LOG] loc2:" loc2)
-          _ (println "[DEBUG_LOG] cell2:" cell2)]
-      (is (= loc1 [1 1]))
-      (is (fish/is? cell1))
-      (is (= 0 (animal/age cell1)))
+          [from to] (animal/reproduce fish [1 1] world)
+          from-loc (-> from keys first)
+          from-cell (-> from vals first)
+          to-loc (-> to keys first)
+          to-cell (-> to vals first)]
+      (is (= from-loc [1 1]))
+      (is (fish/is? from-cell))
+      (is (= 0 (animal/age from-cell)))
       (is (contains? #{[0 0] [0 1] [0 2]
                        [1 0] [1 2]
                        [2 0] [2 1] [2 2]}
-                     loc2))
-      (is (fish/is? cell2))
-      (is (= 0 (animal/age cell2)))))
+                     to-loc))
+      (is (fish/is? to-cell))
+      (is (= 0 (animal/age to-cell)))))
 
   (testing "animal doesn't reproduce if there is no room"
     (let [fish (-> (fish/make)
@@ -143,4 +152,15 @@
       (is (or (fish/is? start-00)
               (fish/is? start-20)))
       (is (or (water/is? start-00)
-              (water/is? start-20))))))
+              (water/is? start-20)))))
+              
+  (testing "fills the world with reproducing fish"
+    (loop [world (-> (world/make 10 10)
+                     (world/set-cell [5 5] (fish/make)))
+           n 100]
+      (if (zero? n)
+        (let [cells (-> world ::world/cells vals)
+              fishies (filter fish/is? cells)
+              fish-count (count fishies)]
+          (is (< 50 fish-count)))
+        (recur (world/tick world) (dec n))))))

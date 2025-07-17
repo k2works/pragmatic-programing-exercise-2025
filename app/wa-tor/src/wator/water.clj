@@ -1,7 +1,8 @@
 (ns wator.water
-  (:require [wator.cell :as cell]))
+  (:require [wator
+             [cell :as cell]]))
 
-(defn make [] {::cell/type :wator.water/water})
+(defn make [] {::cell/type ::water})
 
 (defn is? [cell]
-  (= :wator.water/water (::cell/type cell)))
+  (= ::water (::cell/type cell)))
