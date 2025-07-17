@@ -12,6 +12,7 @@
 (defmulti move (fn [animal & args] (::cell/type animal)))
 (defmulti reproduce (fn [animal & args] (::cell/type animal)))
 (defmulti make-child ::cell/type)
+(defmulti get-reproduction-age ::cell/type)
 
 (defn make []
   {::age 0})

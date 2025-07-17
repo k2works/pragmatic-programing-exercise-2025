@@ -5,6 +5,7 @@
             [wator.cell :as cell]
             [wator.water :as water]
             [wator.fish :as fish]
+            [wator.shark :as shark]
             [wator.world :as world]
             [wator.config :as config]
             [wator.water-imp]
@@ -55,60 +56,73 @@
 
 (deftest animal-test
   (testing "animal moves"
-    (let [fish (fish/make)
-          world (-> (world/make 3 3)
-                    (world/set-cell [1 1] fish))
-          [from to] (animal/move fish [1 1] world)
-          loc (first (keys to))]
-      (is (water/is? (get from [1 1])))
-      (is (fish/is? (get to loc)))
-      (is (contains? #{[0 0] [0 1] [0 2]
-                       [1 0] [1 2]
-                       [2 0] [2 1] [2 2]} loc))))
+    (doseq [scenario [{:constructor fish/make :tester fish/is?}
+                      {:constructor shark/make :tester shark/is?}]]
+      (let [animal ((:constructor scenario))
+            world (-> (world/make 3 3)
+                      (world/set-cell [1 1] animal))
+            [from to] (animal/move animal [1 1] world)
+            loc (first (keys to))]
+        (is (water/is? (get from [1 1])))
+        (is ((:tester scenario) (get to loc)))
+        (is (contains? #{[0 0] [0 1] [0 2]
+                         [1 0] [1 2]
+                         [2 0] [2 1] [2 2]} loc)))))
                        
   (testing "doesn't move if there are no space"
-    (let [fish (fish/make)
-          world (-> (world/make 1 1)
-                    (world/set-cell [0 0] fish))
-          [from to] (animal/move fish [0 0] world)]
-      (is (fish/is? (get to [0 0])))
-      (is (nil? from))))
+    (doseq [scenario [{:constructor fish/make :tester fish/is?}
+                      {:constructor shark/make :tester shark/is?}]]
+      (let [animal ((:constructor scenario))
+            world (-> (world/make 1 1)
+                      (world/set-cell [0 0] animal))
+            [from to] (animal/move animal [0 0] world)]
+        (is ((:tester scenario) (get to [0 0])))
+        (is (nil? from)))))
 
   (testing "animal reproduces"
-    (let [fish (-> (fish/make) (animal/set-age config/fish-reproduction-age))
-          world (-> (world/make 3 3)
-                   (world/set-cell [1 1] fish))
-          [from to] (animal/reproduce fish [1 1] world)
-          from-loc (-> from keys first)
-          from-cell (-> from vals first)
-          to-loc (-> to keys first)
-          to-cell (-> to vals first)]
-      (is (= from-loc [1 1]))
-      (is (fish/is? from-cell))
-      (is (= 0 (animal/age from-cell)))
-      (is (contains? #{[0 0] [0 1] [0 2]
-                       [1 0] [1 2]
-                       [2 0] [2 1] [2 2]}
-                     to-loc))
-      (is (fish/is? to-cell))
-      (is (= 0 (animal/age to-cell)))))
+    (doseq [scenario [{:constructor fish/make :tester fish/is?}
+                      {:constructor shark/make :tester shark/is?}]]
+      (let [animal ((:constructor scenario))
+            reproduction-age (animal/get-reproduction-age animal)
+            animal (animal/set-age animal reproduction-age)
+            world (-> (world/make 3 3)
+                     (world/set-cell [1 1] animal))
+            [from to] (animal/reproduce animal [1 1] world)
+            from-loc (-> from keys first)
+            from-cell (-> from vals first)
+            to-loc (-> to keys first)
+            to-cell (-> to vals first)]
+        (is (= from-loc [1 1]))
+        (is ((:tester scenario) from-cell))
+        (is (= 0 (animal/age from-cell)))
+        (is (contains? #{[0 0] [0 1] [0 2]
+                         [1 0] [1 2]
+                         [2 0] [2 1] [2 2]}
+                       to-loc))
+        (is ((:tester scenario) to-cell))
+        (is (= 0 (animal/age to-cell))))))
 
   (testing "animal doesn't reproduce if there is no room"
-    (let [fish (-> (fish/make)
-                   (animal/set-age config/fish-reproduction-age))
-          world (-> (world/make 1 1)
-                    (world/set-cell [0 0] fish))
-          failed (animal/reproduce fish [0 0] world)]
-      (is (nil? failed))))
+    (doseq [scenario [{:constructor fish/make :tester fish/is?}
+                      {:constructor shark/make :tester shark/is?}]]
+      (let [animal ((:constructor scenario))
+            reproduction-age (animal/get-reproduction-age animal)
+            animal (animal/set-age animal reproduction-age)
+            world (-> (world/make 1 1)
+                      (world/set-cell [0 0] animal))
+            failed (animal/reproduce animal [0 0] world)]
+        (is (nil? failed)))))
 
   (testing "animal doesn't reproduce if too young"
-    (let [fish (-> (fish/make)
-                   (animal/set-age
-                     (dec config/fish-reproduction-age)))
-          world (-> (world/make 3 3)
-                    (world/set-cell [1 1] fish))
-          failed (animal/reproduce fish [1 1] world)]
-      (is (nil? failed))))
+    (doseq [scenario [{:constructor fish/make :tester fish/is?}
+                      {:constructor shark/make :tester shark/is?}]]
+      (let [animal ((:constructor scenario))
+            reproduction-age (animal/get-reproduction-age animal)
+            animal (animal/set-age animal (dec reproduction-age))
+            world (-> (world/make 3 3)
+                      (world/set-cell [1 1] animal))
+            failed (animal/reproduce animal [1 1] world)]
+        (is (nil? failed)))))
       
   (testing "moves a fish around each tick"
     (let [fish (fish/make)
