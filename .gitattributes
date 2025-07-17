@@ -1,0 +1,13 @@
+# すべてのファイルの改行コードをLFに統一
+* text=auto eol=lf
+
+# 特定のファイルタイプに対する設定
+*.java text eol=lf
+*.clj text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# バイナリファイルは変換しない
+*.jar binary
+*.png binary
+*.jpg binary
