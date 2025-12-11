@@ -136,4 +136,5 @@ tmp
 *.iml
 .nrepl-port
 public
-.claude
+.claude!/docs/journal/20251211.md
+/docs/journal/20251211.md
