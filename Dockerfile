@@ -1,32 +1,77 @@
-# Dockerfile for Clojure development
+# ベースイメージとして Ubuntu 22.04 を使用
+FROM ubuntu:22.04 AS base
 
-# Use a base image with Java (required for Clojure)
-FROM eclipse-temurin:17-jdk
+# 環境変数の設定
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=ja_JP.UTF-8 \
+    LC_ALL=ja_JP.UTF-8 \
+    LC_CTYPE=ja_JP.UTF-8 \
+    NODE_VER=22
 
-# Install necessary packages
-RUN apt-get update && \
-    apt-get install -y curl rlwrap make git unzip && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# ユーザーの設定
+ARG USERNAME=developer
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
 
-# Install Clojure CLI tools
-RUN curl -O https://download.clojure.org/install/linux-install-1.11.1.1347.sh && \
-    chmod +x linux-install-1.11.1.1347.sh && \
-    ./linux-install-1.11.1.1347.sh && \
-    rm linux-install-1.11.1.1347.sh
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    #
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Install Leiningen (optional, but useful for some Clojure projects)
-RUN curl -O https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein && \
-    chmod +x lein && \
-    mv lein /usr/local/bin && \
-    lein
+# ロケールのセットアップ
+RUN apt-get update && apt-get install -y \
+    language-pack-ja-base \
+    language-pack-ja \
+    && update-locale LANG=ja_JP.UTF-8 LANGUAGE=ja_JP:ja \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set up working directory
-WORKDIR /app
+# 基本的なパッケージのインストール
+ RUN apt-get update && \
+     apt-get install -y \
+            build-essential \
+            zip \
+            unzip \
+            git \
+            curl \
+            wget \
+            vim \
+            tmux \
+            && apt-get clean \
+            && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables
-ENV JAVA_HOME=/opt/java/openjdk
-ENV PATH=$PATH:$JAVA_HOME/bin
+# Node.jsのインストール
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g yarn \
+    && mkdir -p /home/$USERNAME/.nvm \
+    && chown -R $USERNAME:$USERNAME /home/$USERNAME/.nvm \
+    && echo '#!/bin/bash\n\
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash\n\
+. /home/'$USERNAME'/.nvm/nvm.sh\n\
+nvm install "'$NODE_VER'"\n\
+nvm use "'$NODE_VER'"' > /tmp/nvm_install.sh \
+    && chmod +x /tmp/nvm_install.sh \
+    && su - $USERNAME -c /tmp/nvm_install.sh \
+    && rm /tmp/nvm_install.sh
 
-# Default command
-CMD ["clojure"]
+# Gemini CLIのインストール
+RUN npm install -g @google/gemini-cli
+
+# Claude Codeのインストール
+RUN npm install -g @anthropic-ai/claude-code
+
+# すべてのインストールが完了した後、ユーザーのホームディレクトリの所有権を確保
+RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
+
+# 作業ディレクトリの設定
+WORKDIR /srv
+
+# ユーザーを設定したユーザーに切り替える
+USER $USERNAME
+
+# デフォルトのシェルを bash に設定
+SHELL ["/bin/bash", "-c"]

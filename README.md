@@ -1,40 +1,68 @@
-# 実践プログラミングエクササイズ 2025
-
-[![Node.js CI](https://github.com/k2works/pragmatic-programing-exercise-2025/actions/workflows/node.js.yml/badge.svg)](https://github.com/k2works/pragmatic-programing-exercise-2025/actions/workflows/node.js.yml)
+# {project-name}
 
 ## 概要
-
-[ガイドライン](./docs/slides/PITCHME.md)
 
 ### 目的
 
 ### 前提
 
 | ソフトウェア | バージョン | 備考 |
-| :----------- |:------| :--- |
-| nodejs       | 20.x  |      |
+| :----------- | :--------- | :--- |
+| nodejs       | 12.12.0    |      |
 
-### Quick Start
+## 構成
+
+- [構築](#構築)
+- [配置](#配置)
+- [運用](#運用)
+- [開発](#開発)
+
+## 詳細
+
+### Qick Start
 
 ```bash
 npm install
 npm start
 ```
-## 構成
 
-- [要件](./docs/req.adoc)
-- [開発](./docs/dev.adoc)
-- [構築](./docs/build.adoc)
-- [配置](./docs/ship.adoc)
-- [運用](./docs/run.adoc)
+### 構築
+
+```bash
+claude mcp add github npx @modelcontextprotocol/server-github -e GITHUB_PERSONAL_ACCESS_TOKEN=xxxxxxxxxxxxxxx
+claude mcp add --transport http byterover-mcp --scope user https://mcp.byterover.dev/v2/mcp
+claude mcp add github npx -y @modelcontextprotocol/server-github -s project  
+```
+
+**[⬆ back to top](#構成)**
+
+### 配置
+
+#### GitHub Pages セットアップ
+
+1. **GitHub リポジトリの Settings を開く**
+    - リポジトリページで `Settings` タブをクリック
+
+2. **Pages 設定を開く**
+    - 左サイドバーの `Pages` をクリック
+
+3. **Source を設定**
+    - `Source` で `Deploy from a branch` を選択
+    - `Branch` で `gh-pages` を選択し、フォルダは `/ (root)` を選択
+    - `Save` をクリック
+
+4. **初回デプロイ**
+    - main ブランチにプッシュすると GitHub Actions が自動実行
+    - Actions タブでデプロイ状況を確認
+
+**[⬆ back to top](#構成)**
+
+### 運用
+
+**[⬆ back to top](#構成)**
+
+### 開発
+
+**[⬆ back to top](#構成)**
 
 ## 参照
-
-- [Conventional Commits 1.0.0](https://www.conventionalcommits.org/ja/v1.0.0/)
-- [@k2works/intercept-booster-2](https://www.npmjs.com/package/@k2works/intercept-booster-2)
-- [@k2works/full-stack-lab](https://www.npmjs.com/package/@k2works/full-stack-lab)
-- [@k2works/adr](https://www.npmjs.com/package/@k2works/adr)
-- [Gulp](https://gulpjs.com/docs/en/getting-started/quick-start)
-- [Asciidoctor](https://asciidoctor.org/)
-- [Browsersync](https://browsersync.io/)
-- [Marp](https://marp.app/)

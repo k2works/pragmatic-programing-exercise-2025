@@ -1,8 +1,8 @@
-site_name: 実践プログラミングエクササイズ 2025
-site_description: 実践プログラミングエクササイズ 2025
-site_author: k2works
-repo_url: https://github.com/k2works/pragmatic-programing-exercise-2025
-repo_name: pragmatic-programing-exercise-2025
+site_name: Site Name
+site_description: Site Description
+site_author: Project Team
+repo_url: https://github.com/k2works/claude-code-booster
+repo_name: claude-code-booster
 
 theme:
   name: material
@@ -17,7 +17,7 @@ theme:
     - search.highlight
 
 extra_css:
-  - ops/docker/mkdocs/assets/css/extra.css
+  - docs/mkdocs/assets/css/extra.css
 
 markdown_extensions:
   - pymdownx.highlight
@@ -36,23 +36,24 @@ markdown_extensions:
   - toc:
       permalink: true
   - plantuml_markdown:
-      server: http://plantuml:8080/plantuml
+      server: !!python/object/apply:os.getenv
+        - PLANTUML_SERVER_URL
+        - http://www.plantuml.com/plantuml
       format: svg
 
 extra_javascript:
   - https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js
-  - ops/docker/mkdocs/assets/js/extra.js
+  - docs/assets/js/extra.js
 
 extra:
   plantuml_url: http://www.plantuml.com/plantuml
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/yourusername/go-ddd
-      name: GitHub Repository
+      link: https://github.com/k2works
+      name: GitHub Repository/claude-code-booster
 
 plugins:
   - search
 
 nav:
-  - Journal:
-    - 2025-05-31: journal/20250531.md
+  - Home: index.md
