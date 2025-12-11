@@ -63,50 +63,61 @@
 ### 第4部: デザインパターン - 振る舞いパターン
 
 10. [Strategy パターン](./10-strategy-pattern.md)
-    - アルゴリズムの交換可能性
-    - ポリシーオブジェクトの実装
-    - 料金計算ロジックの例
+    - アルゴリズムをカプセル化し交換可能にする
+    - 料金計算: 通常・割引・会員・数量割引の各戦略
+    - 関数型アプローチ: 高階関数による戦略の合成
+    - マルチメソッドによる多態性の実現
 
 11. [Command パターン](./11-command-pattern.md)
-    - コマンドのデータ化
-    - バッチ処理と優先順位付き実行
-    - Undoable コマンドの実装
+    - 操作をデータとしてカプセル化
+    - テキストコマンド: 挿入・削除・置換
+    - キャンバスコマンド: 図形の追加・削除・移動
+    - Undo/Redo 機能と MacroCommand
 
 12. [Visitor パターン](./12-visitor-pattern.md)
     - データ構造と操作の分離
-    - JSON/XML 変換の実装
+    - JSON/XML 変換 Visitor の実装
+    - 面積・周囲長計算 Visitor
     - マルチメソッドによるダブルディスパッチ
 
 ### 第5部: デザインパターン - 生成パターン
 
 13. [Abstract Factory パターン](./13-abstract-factory-pattern.md)
-    - オブジェクト生成の抽象化
-    - ファクトリー関数の設計
-    - 依存性注入との連携
+    - 関連するオブジェクトのファミリーを一貫して生成
+    - ShapeFactory: Standard/Outlined/Filled の各実装
+    - UIFactory: プラットフォーム別 UI コンポーネント生成
+    - マルチメソッドによる製品生成のディスパッチ
 
 14. [Abstract Server パターン](./14-abstract-server-pattern.md)
-    - 依存関係の逆転
-    - インターフェースによる疎結合
-    - プロトコルとレコードの活用
+    - 依存関係逆転の原則（DIP）の実現
+    - Switchable: Light/Fan/Motor の統一インターフェース
+    - Repository: データアクセスの抽象化
+    - プロトコルとレコードによる疎結合
 
 ### 第6部: 実践的なケーススタディ
 
-15. [給与計算システム](./15-payroll-system.md)
+15. [ゴシップ好きなバスの運転手](./15-gossiping-bus-drivers.md)
+    - バス運転手が停留所で噂を共有するシミュレーション
+    - 無限シーケンス（cycle）による循環ルート表現
+    - 集合演算による噂の伝播
+    - 状態変換パイプラインの実装
+
+16. [給与計算システム](./16-payroll-system.md)
     - ドメインモデリング
     - 支払いスケジュールと給与タイプ
     - Clojure Spec によるデータ検証
 
-16. [レンタルビデオシステム](./16-video-rental-system.md)
+17. [レンタルビデオシステム](./17-video-rental-system.md)
     - 料金計算ロジックの設計
     - ポリシーパターンの適用
     - テキスト/HTML フォーマッターの実装
 
-17. [並行処理システム](./17-concurrency-system.md)
+18. [並行処理システム](./18-concurrency-system.md)
     - Clojure エージェントによる非同期処理
     - 状態機械パターン
     - イベント駆動アーキテクチャ
 
-18. [Wa-Tor シミュレーション](./18-wator-simulation.md)
+19. [Wa-Tor シミュレーション](./19-wator-simulation.md)
     - 捕食者-被食者モデルの実装
     - セルオートマトンとマルチメソッド
     - GUI との統合（Quil）
@@ -114,17 +125,17 @@
 
 ### 第7部: まとめと応用
 
-19. [パターン間の相互作用](./19-pattern-interactions.md)
+20. [パターン間の相互作用](./20-pattern-interactions.md)
     - Composite と Decorator の組み合わせ
     - Command と Observer の連携
     - 複合的なアーキテクチャ設計
 
-20. [関数型デザインのベストプラクティス](./20-best-practices.md)
+21. [関数型デザインのベストプラクティス](./21-best-practices.md)
     - データ中心設計
     - 純粋関数と副作用の分離
     - テスト可能な設計
 
-21. [オブジェクト指向から関数型への移行](./21-oo-to-fp-migration.md)
+22. [オブジェクト指向から関数型への移行](./22-oo-to-fp-migration.md)
     - 既存コードのリファクタリング戦略
     - 段階的な移行アプローチ
     - 共存と統合
